@@ -2,7 +2,7 @@ import { onMount } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
 import { supabase } from './supabaseClient';
 
-const channel = supabase.channel('db-events');
+const channel = supabase.channel('db-staff-events');
 const sessionId = Math.random();
 
 const useStaff = () => {
