@@ -1,11 +1,9 @@
-import { createEffect } from 'solid-js';
-import { createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 
 import useStaff from './useStaff';
 
 export default function Staff() {
 	const { staff, addStaff, removeStaff, createProfessional } = useStaff();
-	// const { addProfessional } = useProfessionals();
 
 	const [selectedStaffId, setSelectedStaffId] = createSignal(null);
 	const currUser = () => staff().find(p => p.id === selectedStaffId());
@@ -50,6 +48,9 @@ export default function Staff() {
 				<button onClick={e => setSelectedStaffId(null)}>X</button>
 				<h3>{currUser().name}</h3>
 				<p>{currUser().email}</p>
+				<button onClick={e => createProfessional(currUser())}>
+					Create Professional
+				</button>
 			</Show>
 		</div>
 	);
