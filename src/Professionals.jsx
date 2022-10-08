@@ -4,11 +4,7 @@ import { store, removeProfessional } from "./store";
 export default function Professionals() {
   const [currProfessionalId, setCurrProfessionalId] = createSignal(null);
 
-  const currUser = () => professionals.find((c) => c.id === currProfessionalId());
-
-  createEffect(() => {
-    console.log(currProfessionalId());
-  });
+  const currUser = () => store.professionals.find((c) => c.id === currProfessionalId());
 
   return (
     <div>

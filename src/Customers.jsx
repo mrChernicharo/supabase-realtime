@@ -5,7 +5,7 @@ import { store, addCustomer, removeCustomer } from "./store";
 export default function Customers() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);
 
-  const currUser = () => customers.find((c) => c.id === currCustomerId());
+  const currUser = () => store.customers.find((c) => c.id === currCustomerId());
 
   return (
     <div>

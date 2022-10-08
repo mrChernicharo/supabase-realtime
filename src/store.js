@@ -7,30 +7,50 @@ const INITIAL_STORE = {
   staff: [],
 };
 
+const channel = supabase.channel("db-changes");
+
 const [store, setStore] = createStore(INITIAL_STORE);
 
 const addStaff = async ({ name, email }) => {
-  const { data: newEntry } = await supabase.from("staff").insert([{ name, email }]).select();
+  const { data } = await supabase.from("staff").insert([{ name, email }]).select();
+  const newEntry = data[0];
 
   console.log("addStaff", { newEntry });
-  setStore("staff", (prev) => [...prev, newEntry[0]]);
+  setStore("staff", (prev) => [...prev, newEntry]);
+
+  channel.send({
+    type: "broadcast",
+    event: "staff_added",
+    payload: newEntry,
+  });
 };
 
 const addCustomer = async ({ name, email }) => {
-  const { data: newEntry } = await supabase.from("customers").insert([{ name, email }]).select();
+  const { data } = await supabase.from("customers").insert([{ name, email }]).select();
+  const newEntry = data[0];
 
   console.log("addCustomer", { newEntry });
-  setStore("customers", (prev) => [...prev, newEntry[0]]);
+  setStore("customers", (prev) => [...prev, newEntry]);
+
+  channel.send({
+    type: "broadcast",
+    event: "customer_added",
+    payload: newEntry,
+  });
 };
 
 const addProfessional = async ({ name, email }) => {
-  const { data: newEntry } = await supabase
-    .from("professionals")
-    .insert([{ name, email }])
-    .select();
+  const { data } = await supabase.from("professionals").insert([{ name, email }]).select();
+  const newEntry = data[0];
 
   console.log("addProfessional", { newEntry });
-  setStore("professionals", (prev) => [...prev, newEntry[0]]);
+  setStore("professionals", (prev) => [...prev, newEntry]);
+
+  channel.send({
+    type: "broadcast",
+    event: "professional_added",
+    payload: newEntry,
+  });
 };
 
 const removeStaff = async (id) => {
@@ -40,6 +60,12 @@ const removeStaff = async (id) => {
     "staff",
     store.staff.filter((o) => o.id !== id)
   );
+
+  channel.send({
+    type: "broadcast",
+    event: "staff_removed",
+    payload: removedEntry,
+  });
 };
 
 const removeCustomer = async (id) => {
@@ -49,6 +75,12 @@ const removeCustomer = async (id) => {
     "customers",
     store.customers.filter((o) => o.id !== id)
   );
+
+  channel.send({
+    type: "broadcast",
+    event: "customer_removed",
+    payload: removedEntry,
+  });
 };
 
 const removeProfessional = async (id) => {
@@ -63,15 +95,39 @@ const removeProfessional = async (id) => {
     "professionals",
     store.professionals.filter((o) => o.id !== id)
   );
+
+  channel.send({
+    type: "broadcast",
+    event: "professional_removed",
+    payload: removedEntry,
+  });
 };
 
-const { data: fetchedStaff } = await supabase.from("staff").select("*");
-const { data: fetchedCustomers } = await supabase.from("customers").select("*");
-const { data: fetchedProfessionals } = await supabase.from("professionals").select("*");
+// initial fetching (hydration)
+Promise.all([
+  supabase
+    .from("staff")
+    .select("*")
+    .then(({ data }) => setStore("staff", data)),
+  supabase
+    .from("customers")
+    .select("*")
+    .then(({ data }) => setStore("customers", data)),
+  supabase
+    .from("professionals")
+    .select("*")
+    .then(({ data }) => setStore("professionals", data)),
+]);
 
-setStore("staff", fetchedStaff);
-setStore("customers", fetchedCustomers);
-setStore("professionals", fetchedProfessionals);
+// realtime events handles & subscription
+channel
+  .on("broadcast", { event: "staff_added" }, console.log)
+  .on("broadcast", { event: "customer_added" }, console.log)
+  .on("broadcast", { event: "professional_added" }, console.log)
+  .on("broadcast", { event: "staff_removed" }, console.log)
+  .on("broadcast", { event: "customer_removed" }, console.log)
+  .on("broadcast", { event: "professional_removed" }, console.log)
+  .subscribe(console.log);
 
 export {
   store,

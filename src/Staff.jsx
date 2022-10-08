@@ -5,10 +5,6 @@ export default function Staff() {
   const [selectedStaffId, setSelectedStaffId] = createSignal(null);
   const currUser = () => store.staff.find((p) => p.id === selectedStaffId());
 
-  createEffect(() => {
-    console.log(selectedStaffId());
-  });
-
   return (
     <div>
       <label>Staff Email</label>
