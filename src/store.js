@@ -6,6 +6,27 @@ const INITIAL_STORE = {
   customers: [],
   staff: [],
 };
+const DEFAULT_CUSTOMER_AVAILABILITY = [
+  { customer_id: "", day: 1, time: "14:00" },
+  { customer_id: "", day: 1, time: "14:30" },
+  { customer_id: "", day: 1, time: "15:00" },
+  { customer_id: "", day: 1, time: "15:30" },
+  { customer_id: "", day: 3, time: "14:00" },
+  { customer_id: "", day: 3, time: "14:30" },
+  { customer_id: "", day: 3, time: "15:00" },
+  { customer_id: "", day: 3, time: "15:30" },
+];
+
+const DEFAULT_PROFESSIONAL_AVAILABILITY = [
+  { professional_id: "", day: 1, time: "14:00" },
+  { professional_id: "", day: 1, time: "14:30" },
+  { professional_id: "", day: 1, time: "15:00" },
+  { professional_id: "", day: 1, time: "15:30" },
+  { professional_id: "", day: 3, time: "14:00" },
+  { professional_id: "", day: 3, time: "14:30" },
+  { professional_id: "", day: 3, time: "15:00" },
+  { professional_id: "", day: 3, time: "15:30" },
+];
 
 const channel = supabase.channel("db-changes");
 
@@ -33,8 +54,18 @@ const addCustomer = async ({ name, email }) => {
   if (error) return console.log(error);
 
   const entry = data[0];
+  const customerAvailability = DEFAULT_CUSTOMER_AVAILABILITY.map((o) => ({
+    ...o,
+    customer_id: entry.id,
+  }));
 
-  console.log("addCustomer", { entry });
+  const { data: availability, error: err2 } = await supabase
+    .from("customer_availability")
+    .insert(customerAvailability)
+    .select();
+  if (err2) return console.log(err2);
+
+  console.log("addCustomer", { entry, availability });
   setStore("customers", (prev) => [...prev, entry]);
 
   channel.send({
@@ -49,8 +80,18 @@ const addProfessional = async ({ name, email }) => {
   if (error) return console.log(error);
 
   const entry = data[0];
+  const professionalAvailability = DEFAULT_PROFESSIONAL_AVAILABILITY.map((o) => ({
+    ...o,
+    professional_id: entry.id,
+  }));
 
-  console.log("addProfessional", { entry });
+  const { data: availability, error: err2 } = await supabase
+    .from("professional_availability")
+    .insert(professionalAvailability)
+    .select();
+  if (err2) return console.log(err2);
+
+  console.log("addProfessional", { entry, availability });
   setStore("professionals", (prev) => [...prev, entry]);
 
   channel.send({
