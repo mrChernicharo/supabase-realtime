@@ -1,5 +1,4 @@
-import { onMount } from 'solid-js';
-import { createSignal, createEffect } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup } from 'solid-js';
 import { supabase } from './supabaseClient';
 
 const channel = supabase.channel('db-customers-events');
@@ -58,7 +57,11 @@ const useCustomers = () => {
 				console.log('customer_removed', { payload });
 				setCustomers(customers().filter(u => u.id !== payload.id));
 			})
-			.subscribe(console.log);
+			.subscribe(status => console.log('useCustomers', status));
+	});
+
+	onCleanup(() => {
+		channel.unsubscribe();
 	});
 
 	return { customers, setCustomers, addCustomer, removeCustomer };

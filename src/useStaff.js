@@ -1,8 +1,8 @@
-import { onMount } from 'solid-js';
-import { createSignal, createEffect } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup } from 'solid-js';
 import { supabase } from './supabaseClient';
 
 const channel = supabase.channel('db-staff-events');
+const professionalsChannel = supabase.channel('db-professionals-events');
 const sessionId = Math.random();
 
 const useStaff = () => {
@@ -11,14 +11,16 @@ const useStaff = () => {
 	async function addStaff(email) {
 		console.log(email);
 		const name = email.split('@')[0];
-		console.log('addStaff', { email, name });
 
-		await supabase.from('staff').insert({ email, name });
+		await supabase.from('staff').insert([{ email, name }]);
+		const { data: results } = await supabase
+			.from('staff')
+			.select('*')
+			.eq('email', email);
 
-		const data = {
-			email,
-			name,
-		};
+		const data = results[0];
+
+		console.log('addStaff', { email, name, data });
 
 		channel.send({
 			type: 'broadcast',
@@ -27,7 +29,7 @@ const useStaff = () => {
 			data,
 		});
 
-		setStaff([...staff(), { email, name }]);
+		setStaff([...staff(), { ...data }]);
 	}
 
 	async function removeStaff(id) {
@@ -44,6 +46,23 @@ const useStaff = () => {
 		setStaff(staff().filter(u => u.id !== id));
 	}
 
+	function createProfessional(info) {
+		const { id, name, email } = info;
+
+		console.log('create professional', professionalsChannel.canPush());
+
+		professionalsChannel
+			.send({
+				type: 'broadcast',
+				event: 'staff_professional_added',
+				data: { id, name, email },
+			})
+			.then(res => {
+				// professionalsChannel.untrack();
+				console.log(res);
+			});
+	}
+
 	onMount(async () => {
 		const { data } = await supabase.from('staff').select('*');
 		setStaff(data);
@@ -58,9 +77,20 @@ const useStaff = () => {
 				console.log('staff_removed', { payload });
 				setStaff(staff().filter(u => u.id !== payload.id));
 			})
-			.subscribe(console.log);
+			.subscribe(status => console.log('useStaff', status));
+
+		const subs = professionalsChannel.subscribe(status =>
+			console.log('useStaff professional', status)
+		);
+
+		console.log(subs);
 	});
 
-	return { staff, setStaff, addStaff, removeStaff };
+	onCleanup(() => {
+		channel.unsubscribe();
+		professionalsChannel.unsubscribe();
+	});
+
+	return { staff, setStaff, addStaff, removeStaff, createProfessional };
 };
 export default useStaff;

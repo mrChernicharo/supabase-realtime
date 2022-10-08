@@ -3,6 +3,7 @@ import { onMount } from 'solid-js';
 import { supabase } from './supabaseClient';
 import Staff from './Staff';
 import Customers from './Customers';
+import Professionals from './Professionals';
 
 function App() {
 	return (
@@ -10,6 +11,8 @@ function App() {
 			<Staff />
 
 			<Customers />
+
+			<Professionals />
 		</div>
 	);
 }

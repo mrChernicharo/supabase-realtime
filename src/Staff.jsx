@@ -1,7 +1,18 @@
+import { createEffect } from 'solid-js';
+import { createSignal } from 'solid-js';
+
 import useStaff from './useStaff';
 
 export default function Staff() {
-	const { staff, addStaff, removeStaff } = useStaff();
+	const { staff, addStaff, removeStaff, createProfessional } = useStaff();
+	// const { addProfessional } = useProfessionals();
+
+	const [selectedStaffId, setSelectedStaffId] = createSignal(null);
+	const currUser = () => staff().find(p => p.id === selectedStaffId());
+
+	createEffect(() => {
+		console.log(selectedStaffId());
+	});
 
 	return (
 		<div>
@@ -18,19 +29,28 @@ export default function Staff() {
 			/>
 			<For each={staff()}>
 				{person => (
-					<div>
-						<p>
+					<div className="d-flex">
+						<p onClick={e => setSelectedStaffId(person.id)}>
 							{person.name} : {person.email}
-							<button
-								class="btn btn-danger"
-								onClick={e => removeStaff(person.id)}
-							>
-								X
-							</button>
 						</p>
+						<button
+							class="btn btn-danger"
+							onClick={e => {
+								removeStaff(person.id);
+								setSelectedStaffId(null);
+							}}
+						>
+							X
+						</button>
 					</div>
 				)}
 			</For>
+
+			<Show when={selectedStaffId() && currUser()}>
+				<button onClick={e => setSelectedStaffId(null)}>X</button>
+				<h3>{currUser().name}</h3>
+				<p>{currUser().email}</p>
+			</Show>
 		</div>
 	);
 }
