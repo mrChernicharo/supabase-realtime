@@ -19,7 +19,7 @@ function App() {
       </div>
 
       <AppointmentRequests />
-      {/* <pre>{JSON.stringify(store, null, 2)}</pre> */}
+      <pre>{JSON.stringify(store, null, 2)}</pre>
     </>
   );
 }

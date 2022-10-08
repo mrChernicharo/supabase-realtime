@@ -4,13 +4,6 @@ import { loadCustomerAvailability } from "./store";
 import { parseWeekday } from "./helpers";
 
 export default function CustomerDetails(props) {
-  const [availability, setAvailability] = createSignal([]);
-
-  onMount(async () => {
-    const results = await loadCustomerAvailability(props.customer.id);
-    setAvailability(results);
-  });
-
   return (
     <>
       <button onClick={props.onClose}>X</button>
@@ -19,7 +12,7 @@ export default function CustomerDetails(props) {
 
       <h3>Customer Availability</h3>
       <ul>
-        <For each={availability()}>
+        <For each={props.customer.customer_availability}>
           {(timeBlock) => (
             <li>
               <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>

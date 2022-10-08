@@ -67,7 +67,7 @@ const addCustomer = async ({ name, email }) => {
   if (err2) return console.log(err2);
 
   console.log("addCustomer", { entry, availability });
-  setStore("customers", (prev) => [...prev, entry]);
+  setStore("customers", (prev) => [...prev, { ...entry, customer_availability: availability }]);
 
   channel.send({
     type: "broadcast",
@@ -94,7 +94,10 @@ const addProfessional = async ({ name, email }) => {
   if (err2) return console.log(err2);
 
   console.log("addProfessional", { entry, availability });
-  setStore("professionals", (prev) => [...prev, entry]);
+  setStore("professionals", (prev) => [
+    ...prev,
+    { ...entry, professional_availability: availability },
+  ]);
 
   channel.send({
     type: "broadcast",
@@ -244,11 +247,11 @@ Promise.all([
     .then(({ data }) => setStore("staff", data)),
   supabase
     .from("customers")
-    .select("*")
+    .select("*, customer_availability:id ( id, day, time, status )")
     .then(({ data }) => setStore("customers", data)),
   supabase
     .from("professionals")
-    .select("*")
+    .select("*, professional_availability:id (id, day, time, status)")
     .then(({ data }) => setStore("professionals", data)),
 ]);
 
