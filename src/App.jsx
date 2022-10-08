@@ -23,7 +23,7 @@ function App() {
 				{person => (
 					<div>
 						<p>
-							{person.name || 'user'} : {person.email}
+							{person.name} : {person.email}
 							<button
 								class="btn btn-danger"
 								onClick={e => removeStaff(person.id)}

@@ -9,6 +9,7 @@ const useStaff = () => {
 	const [staff, setStaff] = createSignal([]);
 
 	async function addStaff(email) {
+		console.log(email);
 		const name = email.split('@')[0];
 		console.log('addStaff', { email, name });
 
