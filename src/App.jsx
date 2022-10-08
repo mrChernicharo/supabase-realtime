@@ -1,37 +1,58 @@
-import { createClient } from '@supabase/supabase-js';
-import { createSignal } from 'solid-js';
-
+import { createSignal, createEffect } from 'solid-js';
+import { onMount } from 'solid-js';
 import { supabase } from './supabaseClient';
 
+const channel = supabase.channel('db-events');
+
 function App() {
-	const staffChannel = supabase.channel('staff');
+	async function addStaff(e) {
+		if (e.currentTarget.validity.valid) {
+			const email = e.currentTarget.value;
+			const name = email.split('@')[0];
+			await supabase.from('staff').insert({ email, name });
 
-	const [currentStaff, setCurrentStaff] = createSignal([]);
+			const data = {
+				email,
+				name,
+			};
 
-	const addStaff = async e => {
-		if (e.currentTarget.validity.valid)
-			setCurrentStaff(prev => [...prev, e.currentTarget.value]);
-		await staffChannel.send({
-			type: 'broadcast',
-			event: 'staff_updated',
-			payload: currentStaff(),
-		});
-	};
+			channel.send({
+				type: 'broadcast',
+				event: 'staff_added',
+				data,
+			});
 
-	staffChannel
-		.on('broadcast', { event: 'staff_updated' }, data => {
-			console.log('staff_updated', data.payload);
-			setCurrentStaff(data.payload);
-		})
-		.subscribe(async status => {
-			console.log(status);
-		});
+			console.log('staff email created');
+			setStaff(prev => [...prev, { ...data }]);
+		} else {
+			console.log('invalid email');
+		}
+	}
+
+	const [staff, setStaff] = createSignal([]);
+
+	onMount(() => {
+		channel
+			.on('broadcast', { event: 'staff_added' }, payload => {
+				console.log('staff_added', { payload });
+
+				setStaff(prev => [...prev, { ...payload.data }]);
+			})
+			.subscribe(console.log);
+	});
+
+	createEffect(async () => {
+		const { data } = await supabase.from('staff').select('*');
+		setStaff(data);
+	});
 
 	return (
 		<div>
 			Hello
 			<input type="email" onChange={addStaff} />
-			<pre>{JSON.stringify(currentStaff(), null, 2)}</pre>
+			<pre style={{ 'font-size': '8px' }}>
+				{JSON.stringify(staff(), null, 2)}
+			</pre>
 		</div>
 	);
 }
