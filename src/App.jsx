@@ -4,6 +4,7 @@ import { supabase } from "./supabaseClient";
 import Staff from "./Staff";
 import Customers from "./Customers";
 import Professionals from "./Professionals";
+import AppointmentRequests from "./AppointmentRequests";
 import { store } from "./store";
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
 
         <Professionals />
       </div>
+
+      <AppointmentRequests />
       {/* <pre>{JSON.stringify(store, null, 2)}</pre> */}
     </>
   );
