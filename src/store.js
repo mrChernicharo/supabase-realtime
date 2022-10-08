@@ -11,8 +11,11 @@ const channel = supabase.channel("db-changes");
 
 const [store, setStore] = createStore(INITIAL_STORE);
 
+// db update funcs
 const addStaff = async ({ name, email }) => {
-  const { data } = await supabase.from("staff").insert([{ name, email }]).select();
+  const { data, error } = await supabase.from("staff").insert([{ name, email }]).select();
+  if (error) return console.log(error);
+
   const entry = data[0];
 
   console.log("addStaff", { entry });
@@ -26,7 +29,9 @@ const addStaff = async ({ name, email }) => {
 };
 
 const addCustomer = async ({ name, email }) => {
-  const { data } = await supabase.from("customers").insert([{ name, email }]).select();
+  const { data, error } = await supabase.from("customers").insert([{ name, email }]).select();
+  if (error) return console.log(error);
+
   const entry = data[0];
 
   console.log("addCustomer", { entry });
@@ -40,7 +45,9 @@ const addCustomer = async ({ name, email }) => {
 };
 
 const addProfessional = async ({ name, email }) => {
-  const { data } = await supabase.from("professionals").insert([{ name, email }]).select();
+  const { data, error } = await supabase.from("professionals").insert([{ name, email }]).select();
+  if (error) return console.log(error);
+
   const entry = data[0];
 
   console.log("addProfessional", { entry });
@@ -54,9 +61,11 @@ const addProfessional = async ({ name, email }) => {
 };
 
 const removeStaff = async (id) => {
-  const { data } = await supabase.from("staff").delete().match({ id }).select();
-  const removedEntry = data[0];
-  console.log("removeStaff", removedEntry);
+  const { data, error } = await supabase.from("staff").delete().match({ id }).select();
+  if (error) return console.log(error);
+
+  const entry = data[0];
+  console.log("removeStaff", entry);
   setStore(
     "staff",
     store.staff.filter((o) => o.id !== id)
@@ -65,15 +74,17 @@ const removeStaff = async (id) => {
   channel.send({
     type: "broadcast",
     event: "staff_removed",
-    payload: removedEntry,
+    entry,
   });
 };
 
 const removeCustomer = async (id) => {
-  const { data } = await supabase.from("customers").delete().match({ id }).select();
-  const removedEntry = data[0];
+  const { data, error } = await supabase.from("customers").delete().match({ id }).select();
+  if (error) return console.log(error);
 
-  console.log("removeCustomer", removedEntry);
+  const entry = data[0];
+
+  console.log("removeCustomer", entry);
   setStore(
     "customers",
     store.customers.filter((o) => o.id !== id)
@@ -82,15 +93,17 @@ const removeCustomer = async (id) => {
   channel.send({
     type: "broadcast",
     event: "customer_removed",
-    payload: removedEntry,
+    entry,
   });
 };
 
 const removeProfessional = async (id) => {
-  const { data } = await supabase.from("professionals").delete().match({ id }).select();
-  const removedEntry = data[0];
+  const { data, error } = await supabase.from("professionals").delete().match({ id }).select();
+  if (error) return console.log(error);
 
-  console.log("remove Professional", removedEntry);
+  const entry = data[0];
+
+  console.log("remove Professional", entry);
   setStore(
     "professionals",
     store.professionals.filter((o) => o.id !== id)
@@ -99,7 +112,7 @@ const removeProfessional = async (id) => {
   channel.send({
     type: "broadcast",
     event: "professional_removed",
-    payload: removedEntry,
+    entry,
   });
 };
 
@@ -117,6 +130,21 @@ const onCustomerAdded = (payload) => {
 const onProfessionalAdded = (payload) => {
   console.log("professional_added", { payload });
   setStore("professionals", (prev) => [...prev, { ...payload.entry }]);
+};
+
+const onStaffRemoved = (payload) => {
+  console.log("staff_removed", { payload });
+  setStore("staff", (prev) => prev.filter((p) => p.id !== payload.entry.id));
+};
+
+const onCustomerRemoved = (payload) => {
+  console.log("customer_removed", { payload });
+  setStore("customers", (prev) => prev.filter((p) => p.id !== payload.entry.id));
+};
+
+const onProfessionalRemoved = (payload) => {
+  console.log("professional_removed", { payload });
+  setStore("professionals", (prev) => prev.filter((p) => p.id !== payload.entry.id));
 };
 
 // initial fetching (hydration)
@@ -140,9 +168,9 @@ channel
   .on("broadcast", { event: "staff_added" }, onStaffAdded)
   .on("broadcast", { event: "customer_added" }, onCustomerAdded)
   .on("broadcast", { event: "professional_added" }, onProfessionalAdded)
-  .on("broadcast", { event: "staff_removed" }, console.log)
-  .on("broadcast", { event: "customer_removed" }, console.log)
-  .on("broadcast", { event: "professional_removed" }, console.log)
+  .on("broadcast", { event: "staff_removed" }, onStaffRemoved)
+  .on("broadcast", { event: "customer_removed" }, onCustomerRemoved)
+  .on("broadcast", { event: "professional_removed" }, onProfessionalRemoved)
   .subscribe(console.log);
 
 export {
