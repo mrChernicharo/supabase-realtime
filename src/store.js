@@ -13,48 +13,49 @@ const [store, setStore] = createStore(INITIAL_STORE);
 
 const addStaff = async ({ name, email }) => {
   const { data } = await supabase.from("staff").insert([{ name, email }]).select();
-  const newEntry = data[0];
+  const entry = data[0];
 
-  console.log("addStaff", { newEntry });
-  setStore("staff", (prev) => [...prev, newEntry]);
+  console.log("addStaff", { entry });
+  setStore("staff", (prev) => [...prev, entry]);
 
   channel.send({
     type: "broadcast",
     event: "staff_added",
-    payload: newEntry,
+    entry,
   });
 };
 
 const addCustomer = async ({ name, email }) => {
   const { data } = await supabase.from("customers").insert([{ name, email }]).select();
-  const newEntry = data[0];
+  const entry = data[0];
 
-  console.log("addCustomer", { newEntry });
-  setStore("customers", (prev) => [...prev, newEntry]);
+  console.log("addCustomer", { entry });
+  setStore("customers", (prev) => [...prev, entry]);
 
   channel.send({
     type: "broadcast",
     event: "customer_added",
-    payload: newEntry,
+    entry,
   });
 };
 
 const addProfessional = async ({ name, email }) => {
   const { data } = await supabase.from("professionals").insert([{ name, email }]).select();
-  const newEntry = data[0];
+  const entry = data[0];
 
-  console.log("addProfessional", { newEntry });
-  setStore("professionals", (prev) => [...prev, newEntry]);
+  console.log("addProfessional", { entry });
+  setStore("professionals", (prev) => [...prev, entry]);
 
   channel.send({
     type: "broadcast",
     event: "professional_added",
-    payload: newEntry,
+    entry,
   });
 };
 
 const removeStaff = async (id) => {
-  const { data: removedEntry } = await supabase.from("staff").delete().match({ id }).select();
+  const { data } = await supabase.from("staff").delete().match({ id }).select();
+  const removedEntry = data[0];
   console.log("removeStaff", removedEntry);
   setStore(
     "staff",
@@ -69,7 +70,9 @@ const removeStaff = async (id) => {
 };
 
 const removeCustomer = async (id) => {
-  const { data: removedEntry } = await supabase.from("customers").delete().match({ id }).select();
+  const { data } = await supabase.from("customers").delete().match({ id }).select();
+  const removedEntry = data[0];
+
   console.log("removeCustomer", removedEntry);
   setStore(
     "customers",
@@ -84,11 +87,8 @@ const removeCustomer = async (id) => {
 };
 
 const removeProfessional = async (id) => {
-  const { data: removedEntry } = await supabase
-    .from("professionals")
-    .delete()
-    .match({ id })
-    .select();
+  const { data } = await supabase.from("professionals").delete().match({ id }).select();
+  const removedEntry = data[0];
 
   console.log("remove Professional", removedEntry);
   setStore(
@@ -101,6 +101,22 @@ const removeProfessional = async (id) => {
     event: "professional_removed",
     payload: removedEntry,
   });
+};
+
+// realtime events handlers
+const onStaffAdded = (payload) => {
+  console.log("staff_added", { payload });
+  setStore("staff", (prev) => [...prev, { ...payload.entry }]);
+};
+
+const onCustomerAdded = (payload) => {
+  console.log("customer_added", { payload });
+  setStore("customers", (prev) => [...prev, { ...payload.entry }]);
+};
+
+const onProfessionalAdded = (payload) => {
+  console.log("professional_added", { payload });
+  setStore("professionals", (prev) => [...prev, { ...payload.entry }]);
 };
 
 // initial fetching (hydration)
@@ -119,11 +135,11 @@ Promise.all([
     .then(({ data }) => setStore("professionals", data)),
 ]);
 
-// realtime events handles & subscription
+// realtime subscription
 channel
-  .on("broadcast", { event: "staff_added" }, console.log)
-  .on("broadcast", { event: "customer_added" }, console.log)
-  .on("broadcast", { event: "professional_added" }, console.log)
+  .on("broadcast", { event: "staff_added" }, onStaffAdded)
+  .on("broadcast", { event: "customer_added" }, onCustomerAdded)
+  .on("broadcast", { event: "professional_added" }, onProfessionalAdded)
   .on("broadcast", { event: "staff_removed" }, console.log)
   .on("broadcast", { event: "customer_removed" }, console.log)
   .on("broadcast", { event: "professional_removed" }, console.log)
