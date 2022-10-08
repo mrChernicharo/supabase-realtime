@@ -4,53 +4,34 @@ import { createSignal } from 'solid-js';
 import { supabase } from './supabaseClient';
 
 function App() {
-	const [professionalEmail, setProfessionalEmail] = createSignal('');
-	const [currentUsers, setCurrentUsers] = createSignal([]);
+	const staffChannel = supabase.channel('staff');
 
-	const channel = supabase.channel('online-users');
+	const [currentStaff, setCurrentStaff] = createSignal([]);
 
-	function getRandomUser() {
-		const users = ['Alice', 'Bob', 'Mallory', 'Inian'];
-		return users[Math.floor(Math.random() * users.length)];
-	}
+	const addStaff = async e => {
+		if (e.currentTarget.validity.valid)
+			setCurrentStaff(prev => [...prev, e.currentTarget.value]);
+		await staffChannel.send({
+			type: 'broadcast',
+			event: 'staff_updated',
+			payload: currentStaff(),
+		});
+	};
 
-	channel
-		.on('presence', { event: 'sync' }, () => {
-			console.log('currently online users', channel.presenceState());
-			setCurrentUsers(prev => Object.values(channel.presenceState()));
-		})
-		.on('presence', { event: 'join' }, ({ newPresences }) => {
-			console.log(
-				'new users have joined',
-				{ newPresences },
-				channel.presenceState()
-			);
-		})
-		.on('presence', { event: 'leave' }, ({ leftPresences }) => {
-			console.log(
-				'users have left',
-				{ leftPresences },
-				channel.presenceState()
-			);
+	staffChannel
+		.on('broadcast', { event: 'staff_updated' }, data => {
+			console.log('staff_updated', data.payload);
+			setCurrentStaff(data.payload);
 		})
 		.subscribe(async status => {
-			if (status === 'SUBSCRIBED') {
-				const message = await channel.track({
-					user_name: getRandomUser(),
-				});
-				console.log(message);
-			}
+			console.log(status);
 		});
 
 	return (
 		<div>
 			Hello
-			<input
-				type="email"
-				value={professionalEmail()}
-				onChange={e => setProfessionalEmail(e.currentTarget.value)}
-			/>
-			<pre>{JSON.stringify(currentUsers(), null, 2)}</pre>
+			<input type="email" onChange={addStaff} />
+			<pre>{JSON.stringify(currentStaff(), null, 2)}</pre>
 		</div>
 	);
 }
