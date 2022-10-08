@@ -120,12 +120,19 @@ const removeStaff = async (id) => {
 };
 
 const removeCustomer = async (id) => {
+  const { data: removedAvailability, err } = await supabase
+    .from("customer_availability")
+    .delete()
+    .match({ customer_id: id })
+    .select();
+  if (err) return console.log(err);
+
   const { data, error } = await supabase.from("customers").delete().match({ id }).select();
   if (error) return console.log(error);
 
   const entry = data[0];
 
-  console.log("removeCustomer", entry);
+  console.log("removeCustomer", entry, removedAvailability);
   setStore(
     "customers",
     store.customers.filter((o) => o.id !== id)
@@ -139,12 +146,23 @@ const removeCustomer = async (id) => {
 };
 
 const removeProfessional = async (id) => {
-  const { data, error } = await supabase.from("professionals").delete().match({ id }).select();
+  const { data: removedAvailability, err } = await supabase
+    .from("professional_availability")
+    .delete()
+    .match({ professional_id: id })
+    .select();
+  if (err) return console.log(err);
+
+  const { data, error } = await supabase
+    .from("professionals")
+    .delete({ cascade: true })
+    .match({ id })
+    .select();
   if (error) return console.log(error);
 
   const entry = data[0];
 
-  console.log("remove Professional", entry);
+  console.log("remove Professional", entry, removedAvailability);
   setStore(
     "professionals",
     store.professionals.filter((o) => o.id !== id)
