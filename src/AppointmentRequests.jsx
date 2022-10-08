@@ -1,9 +1,14 @@
+import { For, createMemo, Show, createSignal } from "solid-js";
 import { store } from "./store";
+
+import AvailabilityMatches from "./AvailabilityMatches";
 
 export default function AppointmentRequests(props) {
   // fetch customers without appointments & display
 
+  const [customerId, setCustomerId] = createSignal(null);
   const idleCustomers = () => store.customers.filter((c) => !c.appointments.length);
+  const currCustomer = () => idleCustomers().find((c) => c.id === customerId());
 
   // appointmentRequest customer matchingProfessionalAvailabilities
   // fetch all professionals availabilities
@@ -13,7 +18,19 @@ export default function AppointmentRequests(props) {
     <div style={{ border: "1px dashed" }}>
       <h1>Appointment Requests</h1>
 
-      <pre>{JSON.stringify(idleCustomers(), null, 2)}</pre>
+      <For each={idleCustomers()}>
+        {(customer) => (
+          <div onClick={(e) => setCustomerId(customer.id)}>
+            <h2>{customer.name}</h2>
+          </div>
+        )}
+      </For>
+
+      {/* <pre>{JSON.stringify(idleCustomers(), null, 2)}</pre> */}
+
+      <Show when={customerId()}>
+        <AvailabilityMatches customer={currCustomer()} onClose={() => setCustomerId(null)} />
+      </Show>
     </div>
   );
 }
