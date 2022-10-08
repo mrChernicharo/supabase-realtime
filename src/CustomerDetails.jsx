@@ -12,7 +12,7 @@ export default function CustomerDetails(props) {
 
       <h3>Customer Availability</h3>
       <ul>
-        <For each={props.customer.customer_availability}>
+        <For each={props.customer.availability}>
           {(timeBlock) => (
             <li>
               <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>

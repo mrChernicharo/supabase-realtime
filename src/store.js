@@ -53,10 +53,9 @@ const addCustomer = async ({ name, email }) => {
   const { data, error } = await supabase.from("customers").insert([{ name, email }]).select();
   if (error) return console.log(error);
 
-  const entry = data[0];
   const customerAvailability = DEFAULT_CUSTOMER_AVAILABILITY.map((o) => ({
     ...o,
-    customer_id: entry.id,
+    customer_id: data[0].id,
     status: "1",
   }));
 
@@ -66,8 +65,10 @@ const addCustomer = async ({ name, email }) => {
     .select();
   if (err2) return console.log(err2);
 
-  console.log("addCustomer", { entry, availability });
-  setStore("customers", (prev) => [...prev, { ...entry, customer_availability: availability }]);
+  const entry = { ...data[0], availability, appointments: [] };
+
+  console.log("addCustomer", { entry });
+  setStore("customers", (prev) => [...prev, entry]);
 
   channel.send({
     type: "broadcast",
@@ -80,10 +81,9 @@ const addProfessional = async ({ name, email }) => {
   const { data, error } = await supabase.from("professionals").insert([{ name, email }]).select();
   if (error) return console.log(error);
 
-  const entry = data[0];
   const professionalAvailability = DEFAULT_PROFESSIONAL_AVAILABILITY.map((o) => ({
     ...o,
-    professional_id: entry.id,
+    professional_id: data[0].id,
     status: "1",
   }));
 
@@ -93,11 +93,10 @@ const addProfessional = async ({ name, email }) => {
     .select();
   if (err2) return console.log(err2);
 
-  console.log("addProfessional", { entry, availability });
-  setStore("professionals", (prev) => [
-    ...prev,
-    { ...entry, professional_availability: availability },
-  ]);
+  const entry = { ...data[0], availability, appointments: [] };
+
+  console.log("addProfessional", { entry });
+  setStore("professionals", (prev) => [...prev, entry]);
 
   channel.send({
     type: "broadcast",
@@ -247,11 +246,15 @@ Promise.all([
     .then(({ data }) => setStore("staff", data)),
   supabase
     .from("customers")
-    .select("*, customer_availability:id ( id, day, time, status )")
+    .select(
+      "*, availability:customer_availability ( id, day, time, status ), appointments:realtime_appointments ( id, day, time, status )"
+    )
     .then(({ data }) => setStore("customers", data)),
   supabase
     .from("professionals")
-    .select("*, professional_availability:id (id, day, time, status)")
+    .select(
+      "*, availability:professional_availability (id, day, time, status), appointments:realtime_appointments ( id, day, time, status )"
+    )
     .then(({ data }) => setStore("professionals", data)),
 ]);
 

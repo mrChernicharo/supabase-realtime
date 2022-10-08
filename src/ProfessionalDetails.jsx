@@ -12,7 +12,7 @@ export default function ProfessionalDetails(props) {
 
       <h3>Professional Availability</h3>
       <ul>
-        <For each={props.professional.professional_availability}>
+        <For each={props.professional.availability}>
           {(timeBlock) => (
             <li>
               <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
