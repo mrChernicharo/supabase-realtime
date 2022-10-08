@@ -14,9 +14,10 @@ export default function ProfessionalDetails(props) {
   return (
     <>
       <button onClick={props.onClose}>X</button>
-      <h3>{props.professional.name}</h3>
+      <h2>{props.professional.name}</h2>
       <p>{props.professional.email}</p>
 
+      <h3>Professional Availability</h3>
       <ul>
         <For each={availability()}>
           {(timeBlock) => (

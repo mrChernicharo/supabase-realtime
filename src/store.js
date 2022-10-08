@@ -57,6 +57,7 @@ const addCustomer = async ({ name, email }) => {
   const customerAvailability = DEFAULT_CUSTOMER_AVAILABILITY.map((o) => ({
     ...o,
     customer_id: entry.id,
+    status: "1",
   }));
 
   const { data: availability, error: err2 } = await supabase
@@ -83,6 +84,7 @@ const addProfessional = async ({ name, email }) => {
   const professionalAvailability = DEFAULT_PROFESSIONAL_AVAILABILITY.map((o) => ({
     ...o,
     professional_id: entry.id,
+    status: "1",
   }));
 
   const { data: availability, error: err2 } = await supabase

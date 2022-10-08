@@ -14,9 +14,10 @@ export default function CustomerDetails(props) {
   return (
     <>
       <button onClick={props.onClose}>X</button>
-      <h3>{props.customer.name}</h3>
+      <h2>{props.customer.name}</h2>
       <p>{props.customer.email}</p>
 
+      <h3>Customer Availability</h3>
       <ul>
         <For each={availability()}>
           {(timeBlock) => (
