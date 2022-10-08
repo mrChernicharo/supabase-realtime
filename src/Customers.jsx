@@ -1,6 +1,7 @@
 import { Show } from "solid-js";
 import { createSignal } from "solid-js";
 import { store, addCustomer, removeCustomer } from "./store";
+import CustomerDetails from "./CustomerDetails";
 
 export default function Customers() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);
@@ -45,9 +46,7 @@ export default function Customers() {
       </For>
 
       <Show when={currCustomerId()}>
-        <button onClick={(e) => setCurrCustomerId(null)}>X</button>
-        <h3>{currUser().name}</h3>
-        <p>{currUser().email}</p>
+        <CustomerDetails customer={currUser()} onClose={() => setCurrCustomerId(null)} />
       </Show>
     </div>
   );

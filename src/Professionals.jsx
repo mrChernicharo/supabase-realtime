@@ -1,5 +1,6 @@
 import { createSignal, createEffect } from "solid-js";
 import { store, removeProfessional } from "./store";
+import ProfessionalDetails from "./ProfessionalDetails";
 
 export default function Professionals() {
   const [currProfessionalId, setCurrProfessionalId] = createSignal(null);
@@ -29,9 +30,10 @@ export default function Professionals() {
       </For>
 
       <Show when={currProfessionalId()}>
-        <button onClick={(e) => setCurrProfessionalId(null)}>X</button>
-        <h3>{currUser().name}</h3>
-        <p>{currUser().email}</p>
+        <ProfessionalDetails
+          professional={currUser()}
+          onClose={() => setCurrProfessionalId(null)}
+        />
       </Show>
     </div>
   );

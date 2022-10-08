@@ -175,6 +175,34 @@ const removeProfessional = async (id) => {
   });
 };
 
+const loadCustomerAvailability = async (id) => {
+  const { data, error } = await supabase
+    .from("customer_availability")
+    .select("*")
+    .eq("customer_id", id);
+
+  if (error) {
+    console.log(error);
+    return [];
+  }
+
+  return data;
+};
+
+const loadProfessionalAvailability = async (id) => {
+  const { data, error } = await supabase
+    .from("professional_availability")
+    .select("*")
+    .eq("professional_id", id);
+
+  if (error) {
+    console.log(error);
+    return [];
+  }
+
+  return data;
+};
+
 // realtime events handlers
 const onStaffAdded = (payload) => {
   console.log("staff_added", { payload });
@@ -240,4 +268,6 @@ export {
   removeCustomer,
   removeProfessional,
   removeStaff,
+  loadCustomerAvailability,
+  loadProfessionalAvailability,
 };
