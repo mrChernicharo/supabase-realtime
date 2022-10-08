@@ -22,7 +22,7 @@ export default function ProfessionalDetails(props) {
         <For each={availability()}>
           {(timeBlock) => (
             <li>
-              <p>
+              <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
                 {parseWeekday(timeBlock.day)} {timeBlock.time}
               </p>
             </li>
