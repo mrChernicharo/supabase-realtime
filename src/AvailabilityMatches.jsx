@@ -40,14 +40,7 @@ export default function AvailabilityMatches(props) {
       ...d.dataset,
       customer_id: props.customer.id,
     }));
-
-    /**
-     * prof_id, day, time
-     */
-
     console.log({ selectedCheckboxes });
-
-    // const selectedSlots = selectedCheckboxes.map((ch) => arr2[ch.profIdx][ch.slotIdx]);
 
     await createAppointmentOffers(selectedTimeBlocks);
   }
@@ -74,7 +67,7 @@ export default function AvailabilityMatches(props) {
                         type="checkbox"
                         // data-hash={`${block.day} ${profId} ${block.time}`}
                         // value={availableMatches()[profId][block.id]}
-                        data-professional-id={getProfessional(profId).id}
+                        data-professional_id={getProfessional(profId).id}
                         data-day={block.day}
                         data-time={block.time}
                         // data-prof-idx={profIdx()}

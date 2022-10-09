@@ -209,6 +209,29 @@ const loadProfessionalAvailability = async (id) => {
 
 const createAppointmentOffers = async (offers) => {
   console.log("createAppointmentOffers", offers);
+
+  // patch/remove previous offers
+  const { data: deletedData, error: deleteError } = await supabase
+    .from("appointment_offers")
+    .delete()
+    .eq("customer_id", offers[0].customer_id)
+    .select();
+
+  if (deleteError) {
+    console.log(deleteError);
+    return;
+  }
+
+  const { data, error } = await supabase.from("appointment_offers").insert(offers).select();
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  console.log({ data, deletedData });
+
+  // return data
 };
 
 // realtime events handlers
