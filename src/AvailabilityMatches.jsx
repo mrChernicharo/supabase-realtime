@@ -84,34 +84,41 @@ export default function AvailabilityMatches(props) {
 
       <form onSubmit={handleSubmit}>
         <Show when={!isLoading()} fallback={<div>Loading...</div>}>
-          <For each={Object.keys(matchesByProfessional())}>
-            {(profId, profIdx) => (
-              <div>
-                <h4>{getProfessionalById(profId, store.professionals).name}</h4>
+          <Show
+            when={Object.keys(matchesByProfessional()).length}
+            fallback={<div>No available professionals!</div>}
+          >
+            <For each={Object.keys(matchesByProfessional())}>
+              {(profId, profIdx) => (
+                <div>
+                  <h4>{getProfessionalById(profId, store.professionals).name}</h4>
 
-                <For each={matchesByProfessional()[profId]}>
-                  {(block, i) => (
-                    <div>
-                      <label>
-                        {parseWeekday(block.day)} {block.time} {"  "}
-                        <input
-                          type="checkbox"
-                          checked={isChecked(block)}
-                          data-day={block.day}
-                          data-time={block.time}
-                          data-professional_id={getProfessionalById(profId, store.professionals).id}
-                          data-professional_availability_slot_id={getProfessionalSlotId(
-                            block,
-                            profId
-                          )}
-                        />
-                      </label>
-                    </div>
-                  )}
-                </For>
-              </div>
-            )}
-          </For>
+                  <For each={matchesByProfessional()[profId]}>
+                    {(block, i) => (
+                      <div>
+                        <label>
+                          {parseWeekday(block.day)} {block.time} {"  "}
+                          <input
+                            type="checkbox"
+                            checked={isChecked(block)}
+                            data-day={block.day}
+                            data-time={block.time}
+                            data-professional_id={
+                              getProfessionalById(profId, store.professionals).id
+                            }
+                            data-professional_availability_slot_id={getProfessionalSlotId(
+                              block,
+                              profId
+                            )}
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </For>
+                </div>
+              )}
+            </For>
+          </Show>
         </Show>
 
         <button>Send</button>
