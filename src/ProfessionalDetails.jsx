@@ -29,7 +29,9 @@ export default function ProfessionalDetails(props) {
                     )
                     .map((res) => ({
                       ...res,
-                      customer_name: getCustomerById(res.customer_id, store.customers).name,
+                      customer_name: res.customer_id
+                        ? getCustomerById(res?.customer_id, store.customers)?.name
+                        : "",
                     })),
                   null,
                   2
