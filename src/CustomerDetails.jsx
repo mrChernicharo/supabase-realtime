@@ -2,8 +2,29 @@ import { createSignal } from "solid-js";
 import { onMount } from "solid-js";
 import { loadCustomerAvailability } from "./store";
 import { parseWeekday } from "./helpers";
+import { createEffect } from "solid-js";
+import { supabase } from "./supabaseClient";
+import AppointmentOffers from "./AppointmentOffers";
 
 export default function CustomerDetails(props) {
+  const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
+  const [isLoading, setIsLoading] = createSignal(true);
+
+  createEffect(async () => {
+    console.log("heey", props.customer);
+    setIsLoading(true);
+
+    // getCustomerAppointmentOffers
+    const { data } = await supabase
+      .from("appointment_offers")
+      .select("*")
+      .eq("customer_id", props.customer.id);
+
+    setCustomerAppointmentOffers(data);
+
+    setIsLoading(false);
+  });
+
   // appointment offers
   return (
     <>
@@ -23,6 +44,8 @@ export default function CustomerDetails(props) {
           )}
         </For>
       </ul>
+
+      <AppointmentOffers offers={customerAppointmentOffers()} />
     </>
   );
 }

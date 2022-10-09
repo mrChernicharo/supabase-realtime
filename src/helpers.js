@@ -66,3 +66,5 @@ export const getMergedAvailability = (slots) => {
 
   return res;
 };
+
+export const getProfessionalById = (id, professionals) => professionals.find((p) => p.id === id);
