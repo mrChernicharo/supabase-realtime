@@ -2,6 +2,7 @@ import { For, createMemo, Show, createSignal } from "solid-js";
 import { store } from "./store";
 
 import AvailabilityMatches from "./AvailabilityMatches";
+import { s } from "./styles";
 
 export default function AppointmentRequests(props) {
   // fetch customers without appointments & display
@@ -16,6 +17,9 @@ export default function AppointmentRequests(props) {
 
   return (
     <div style={{ border: "1px dashed" }}>
+      <Show when={idleCustomers().length}>
+        <div style={{ ...s.badge, background: "red" }}></div>
+      </Show>
       <h1>Appointment Requests</h1>
 
       <For each={idleCustomers()}>

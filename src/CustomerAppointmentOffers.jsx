@@ -37,6 +37,7 @@ export default function CustomerAppointmentOffers(props) {
 
       {/* <pre>{JSON.stringify(props.offers, null, 2)}</pre> */}
       <Show when={!props.offers.length}>waiting admin offers...</Show>
+
       <For each={props.offers}>
         {(offer) => {
           const [selectRef, setSelectRef] = createSignal(null);

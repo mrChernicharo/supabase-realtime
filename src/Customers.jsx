@@ -13,6 +13,11 @@ export default function Customers() {
 
   createEffect(() => {});
 
+  const brandNewUser = (person) => !person.appointments.length && !person.appointmentOffers.length;
+  const withOffersUser = (person) => person.appointmentOffers.length;
+  const withAppointmentsUser = (person) =>
+    person.appointments.length && !person.appointmentOffers.length;
+
   return (
     <div>
       <label>Customer Email</label>
@@ -34,9 +39,16 @@ export default function Customers() {
       <For each={store.customers}>
         {(person) => (
           <>
-            <Show when={!person.appointmentOffers.length}>
-              <div style={s.badge}></div>
+            <Show when={brandNewUser(person)}>
+              <div style={{ ...s.badge, background: "#ea2020" }}></div>
             </Show>
+            <Show when={withOffersUser(person)}>
+              <div style={{ ...s.badge, background: "#ffc506" }}></div>
+            </Show>
+            <Show when={withAppointmentsUser(person)}>
+              <div style={{ ...s.badge, background: "#1eecb5" }}></div>
+            </Show>
+
             <div className="d-flex">
               <p onClick={(e) => setCurrCustomerId(person.id)}>
                 {person.name} : {person.email}

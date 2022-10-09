@@ -2,8 +2,11 @@ import { createSignal, createEffect, onMount } from "solid-js";
 import { parseWeekday } from "./helpers";
 import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
 import { s } from "./styles";
+import { Show } from "solid-js";
 
 export default function CustomerDetails(props) {
+  const noAppointments = () => !props.customer.appointments.length;
+
   return (
     <>
       <button onClick={props.onClose}>X</button>
@@ -24,10 +27,12 @@ export default function CustomerDetails(props) {
         </For>
       </ul>
 
-      <CustomerAppointmentOffers
-        customerId={props.customer.id}
-        offers={props.customer.appointmentOffers}
-      />
+      <Show when={noAppointments()}>
+        <CustomerAppointmentOffers
+          customerId={props.customer.id}
+          offers={props.customer.appointmentOffers}
+        />
+      </Show>
     </>
   );
 }

@@ -3,7 +3,6 @@ export const s = {
     width: "12px",
     height: "12px",
     position: "absolute",
-    background: "red",
     "border-radius": "50%",
   },
   ul: {
