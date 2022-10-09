@@ -1,7 +1,8 @@
 import { createSignal } from "solid-js";
 import { onMount } from "solid-js";
 import { loadProfessionalAvailability } from "./store";
-import { parseWeekday } from "./helpers";
+import { parseWeekday, getWorkingHours, mergeAvailability } from "./helpers";
+import EditProfessionalAvailability from "./EditProfessionalAvailability";
 
 export default function ProfessionalDetails(props) {
   return (
@@ -22,6 +23,10 @@ export default function ProfessionalDetails(props) {
           )}
         </For>
       </ul>
+
+      <pre>{JSON.stringify(mergeAvailability(props.professional.availability), null, 2)}</pre>
+
+      <EditProfessionalAvailability />
     </>
   );
 }

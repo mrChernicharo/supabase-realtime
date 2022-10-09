@@ -4,6 +4,7 @@ import { loadCustomerAvailability } from "./store";
 import { parseWeekday } from "./helpers";
 
 export default function CustomerDetails(props) {
+  // appointment offers
   return (
     <>
       <button onClick={props.onClose}>X</button>
