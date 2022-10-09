@@ -7,6 +7,31 @@ import {
   DEFAULT_PROFESSIONAL_AVAILABILITY,
 } from "./constants";
 
+const fetchServer = async () =>
+  await Promise.all([
+    supabase
+      .from("staff")
+      .select("*")
+      .then(({ data }) => setStore("staff", data)),
+    supabase
+      .from("customers")
+      .select(
+        `*, 
+      availability:customer_availability ( id, day, time, status ), 
+      appointments:realtime_appointments ( id, professional_id, day, time, datetime, status ),
+      appointmentOffers:appointment_offers ( id, day, time, professional_id )`
+      )
+      .then(({ data }) => setStore("customers", data)),
+    supabase
+      .from("professionals")
+      .select(
+        `*, 
+      availability:professional_availability (id, day, time, status), 
+      appointments:realtime_appointments ( id, customer_id, day, time, datetime, status )`
+      )
+      .then(({ data }) => setStore("professionals", data)),
+  ]);
+
 const channel = supabase.channel("db-changes");
 
 const [store, setStore] = createStore(INITIAL_STORE);
@@ -129,6 +154,7 @@ const removeCustomer = async (id) => {
 };
 
 const removeProfessional = async (id) => {
+  // 1. remove professional availability slots
   const { data: removedProfessionalAvailability, error: err } = await supabase
     .from("professional_availability")
     .delete()
@@ -136,7 +162,7 @@ const removeProfessional = async (id) => {
     .select();
   if (err) return console.log(err);
 
-  // remove professional appointments
+  // 2. remove professional appointments
   const { data: removedAppointments, error: err1 } = await supabase
     .from("realtime_appointments")
     .delete()
@@ -155,7 +181,7 @@ const removeProfessional = async (id) => {
     availsToPatch.map((o) => o.time),
   ];
 
-  // patch customer_availabilities status back to 1
+  // 3. patch status of affected customer_availabilities
   const { data: updatedCustomerAvails, error: err3 } = await supabase
     .from("customer_availability")
     .update({ status: "1" })
@@ -166,6 +192,10 @@ const removeProfessional = async (id) => {
 
   if (err3) return console.log(err3);
 
+  // 4. remove appointments where professional is involved
+  // ON CASCADE seems to be doing it
+
+  // 5. delete professional
   const { data: deletedProfessional, error } = await supabase
     .from("professionals")
     .delete()
@@ -185,12 +215,10 @@ const removeProfessional = async (id) => {
   });
 
   const entry = deletedProfessional[0];
-
   console.log("remove Professional", entry, removedProfessionalAvailability);
-  setStore(
-    "professionals",
-    store.professionals.filter((o) => o.id !== id)
-  );
+  console.log("and refetch everything so state is in sync!");
+  await fetchServer();
+  console.log("OK!");
 
   channel.send({
     type: "broadcast",
@@ -395,29 +423,7 @@ const onAppointmentOfferConfirmed = (payload) => {
 };
 
 // initial fetching (hydration)
-Promise.all([
-  supabase
-    .from("staff")
-    .select("*")
-    .then(({ data }) => setStore("staff", data)),
-  supabase
-    .from("customers")
-    .select(
-      `*, 
-      availability:customer_availability ( id, day, time, status ), 
-      appointments:realtime_appointments ( id, professional_id, day, time, datetime, status ),
-      appointmentOffers:appointment_offers ( id, day, time, professional_id )`
-    )
-    .then(({ data }) => setStore("customers", data)),
-  supabase
-    .from("professionals")
-    .select(
-      `*, 
-      availability:professional_availability (id, day, time, status), 
-      appointments:realtime_appointments ( id, customer_id, day, time, datetime, status )`
-    )
-    .then(({ data }) => setStore("professionals", data)),
-]);
+fetchServer();
 
 // realtime subscription
 // prettier-ignore

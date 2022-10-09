@@ -38,7 +38,7 @@ export default function Customers() {
 
       <For each={store.customers}>
         {(person) => (
-          <>
+          <Show when={person.id}>
             <Show when={brandNewUser(person)}>
               <div style={{ ...s.badge, background: "#ea2020" }}></div>
             </Show>
@@ -63,11 +63,11 @@ export default function Customers() {
                 X
               </button>
             </div>
-          </>
+          </Show>
         )}
       </For>
 
-      <Show when={currCustomerId()}>
+      <Show when={currCustomerId() && selectedCustomer()}>
         <CustomerDetails customer={selectedCustomer()} onClose={() => setCurrCustomerId(null)} />
       </Show>
     </div>
