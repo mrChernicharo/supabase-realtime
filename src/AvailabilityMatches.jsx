@@ -1,15 +1,22 @@
 import { onMount, For, createMemo } from "solid-js";
 import { store, createAppointmentOffers } from "./store";
 import { parseWeekday } from "./helpers";
+import { supabase } from "./supabaseClient";
+import { createSignal } from "solid-js";
+import { createEffect } from "solid-js";
+import { onCleanup } from "solid-js";
+import { Show } from "solid-js";
 
 export default function AvailabilityMatches(props) {
-  onMount(() => {
-    console.log(store.professionals);
-  });
+  const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
+  const [isLoading, setIsLoading] = createSignal(true);
 
   const getProfessional = (id) => store.professionals.find((p) => p.id === id);
 
-  const availableMatches = createMemo(() => {
+  const getProfessionalSlotId = (block, profId) =>
+    getProfessional(profId).availability.find((av) => av.id === block.id).id;
+
+  const matchesByProfessional = createMemo(() => {
     const availObj = {};
     props.customer.availability.forEach(({ day, time }) => {
       if (!(day in availObj)) availObj[day] = [];
@@ -17,7 +24,7 @@ export default function AvailabilityMatches(props) {
       availObj[day].push({ day, time });
     });
 
-    const matchingAvailsByProfessional = {};
+    const matchingBlocksByProfessional = {};
     store.professionals.forEach((prof) => {
       const commonProfAvailability = prof.availability.filter(
         (av) =>
@@ -26,12 +33,18 @@ export default function AvailabilityMatches(props) {
           availObj[av.day].find((o) => o.time === av.time)
       );
 
-      matchingAvailsByProfessional[prof.id] = commonProfAvailability;
+      matchingBlocksByProfessional[prof.id] = commonProfAvailability;
     });
 
-    console.log({ matchingAvailsByProfessional, availObj });
-    return matchingAvailsByProfessional;
+    // console.log({ matchingBlocksByProfessional, availObj });
+    return matchingBlocksByProfessional;
   });
+
+  const isChecked = (block) => {
+    return customerAppointmentOffers().find(
+      (o) => o.professional_availability_slot_id === block.id
+    );
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -40,10 +53,27 @@ export default function AvailabilityMatches(props) {
       ...d.dataset,
       customer_id: props.customer.id,
     }));
-    console.log({ selectedCheckboxes });
 
     await createAppointmentOffers(selectedTimeBlocks);
   }
+
+  createEffect(async () => {
+    setIsLoading(true);
+
+    // getCustomerAppointmentOffers
+    const { data } = await supabase
+      .from("appointment_offers")
+      .select("*")
+      .eq("customer_id", props.customer.id);
+
+    setCustomerAppointmentOffers(data);
+
+    setIsLoading(false);
+  });
+
+  // createEffect(() => {
+  //   console.log(customerAppointmentOffers());
+  // });
 
   return (
     <div>
@@ -53,33 +83,36 @@ export default function AvailabilityMatches(props) {
       <p>{props.customer.email}</p>
 
       <form onSubmit={handleSubmit}>
-        <For each={Object.keys(availableMatches())}>
-          {(profId, profIdx) => (
-            <div>
-              <h4>{getProfessional(profId).name}</h4>
+        <Show when={!isLoading()} fallback={<div>Loading...</div>}>
+          <For each={Object.keys(matchesByProfessional())}>
+            {(profId, profIdx) => (
+              <div>
+                <h4>{getProfessional(profId).name}</h4>
 
-              <For each={availableMatches()[profId]}>
-                {(block, i) => (
-                  <div>
-                    <label>
-                      {parseWeekday(block.day)} {block.time}{" "}
-                      <input
-                        type="checkbox"
-                        // data-hash={`${block.day} ${profId} ${block.time}`}
-                        // value={availableMatches()[profId][block.id]}
-                        data-professional_id={getProfessional(profId).id}
-                        data-day={block.day}
-                        data-time={block.time}
-                        // data-prof-idx={profIdx()}
-                        // data-slot-idx={i()}
-                      />
-                    </label>
-                  </div>
-                )}
-              </For>
-            </div>
-          )}
-        </For>
+                <For each={matchesByProfessional()[profId]}>
+                  {(block, i) => (
+                    <div>
+                      <label>
+                        {parseWeekday(block.day)} {block.time} {"  "}
+                        <input
+                          type="checkbox"
+                          checked={isChecked(block)}
+                          data-day={block.day}
+                          data-time={block.time}
+                          data-professional_id={getProfessional(profId).id}
+                          data-professional_availability_slot_id={getProfessionalSlotId(
+                            block,
+                            profId
+                          )}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </For>
+              </div>
+            )}
+          </For>
+        </Show>
 
         <button>Send</button>
       </form>
