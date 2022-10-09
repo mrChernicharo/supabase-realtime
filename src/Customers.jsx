@@ -34,7 +34,7 @@ export default function Customers() {
       <For each={store.customers}>
         {(person) => (
           <>
-            <Show when={person.appointmentOffers.length}>
+            <Show when={!person.appointmentOffers.length}>
               <div style={s.badge}></div>
             </Show>
             <div className="d-flex">

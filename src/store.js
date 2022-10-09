@@ -198,6 +198,12 @@ const createAppointmentOffers = async (customerId, offers) => {
 
 const confirmOffer = async (customerId, offer) => {
   console.log("confirmOffer", { customerId, offer });
+  channel.send({
+    type: "broadcast",
+    event: "appointment_offer_confirmed_by_customer",
+    customerId,
+    entry: offer,
+  });
 };
 
 // realtime events handlers
@@ -231,8 +237,8 @@ const onProfessionalRemoved = (payload) => {
   setStore("professionals", (prev) => prev.filter((p) => p.id !== payload.entry.id));
 };
 
-const onOfferCreated = (payload) => {
-  console.log("onOfferCreated", { payload });
+const onAppointmentOfferCreated = (payload) => {
+  console.log("onAppointmentOfferCreated", { payload });
   setStore("customers", (prev) =>
     prev.map((c) =>
       c.id === payload.customerId ? { ...c, appointmentOffers: [...payload.entries] } : c
@@ -240,8 +246,8 @@ const onOfferCreated = (payload) => {
   );
 };
 
-const onOfferConfirmed = (payload) => {
-  console.log("on offer confirmed", { payload });
+const onAppointmentOfferConfirmed = (payload) => {
+  console.log("appointment offer confirmed by customer", { payload });
 };
 
 // initial fetching (hydration)
@@ -270,6 +276,7 @@ Promise.all([
 ]);
 
 // realtime subscription
+// prettier-ignore
 channel
   .on("broadcast", { event: "staff_added" }, onStaffAdded)
   .on("broadcast", { event: "customer_added" }, onCustomerAdded)
@@ -277,7 +284,8 @@ channel
   .on("broadcast", { event: "staff_removed" }, onStaffRemoved)
   .on("broadcast", { event: "customer_removed" }, onCustomerRemoved)
   .on("broadcast", { event: "professional_removed" }, onProfessionalRemoved)
-  .on("broadcast", { event: "appointment_offer_created" }, onOfferCreated)
+  .on("broadcast", { event: "appointment_offer_created" }, onAppointmentOfferCreated)
+  .on("broadcast", { event: "appointment_offer_confirmed_by_customer" }, onAppointmentOfferConfirmed)
   .subscribe(console.log);
 
 export {
@@ -290,5 +298,4 @@ export {
   removeStaff,
   createAppointmentOffers,
   confirmOffer,
-  onOfferConfirmed,
 };
