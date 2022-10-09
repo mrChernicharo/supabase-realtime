@@ -2,7 +2,7 @@ import { For } from "solid-js";
 import { getProfessionalById, parseWeekday } from "./helpers";
 import { store } from "./store";
 
-export default function AppointmentOffers(props) {
+export default function CustomerAppointmentOffers(props) {
   return (
     <div>
       <h3>Appointment Offers</h3>

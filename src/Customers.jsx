@@ -17,19 +17,10 @@ const s = {
 
 export default function Customers() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);
-  const [hasOffers, setHasOffers] = createSignal(false);
 
-  const currUser = createMemo(() => store.customers.find((c) => c.id === currCustomerId()));
-  const currCustomerOffers = createMemo(() =>
-    store.customers.find((c) => c.id === currCustomerId())
-  );
+  const selectedCustomer = createMemo(() => store.customers.find((c) => c.id === currCustomerId()));
 
-  createEffect(() => {
-    if (currCustomerOffers()) {
-      console.log({ currCustomerOffers: currCustomerOffers().appointmentOffers });
-      setHasOffers(currCustomerOffers().appointmentOffers.length);
-    }
-  });
+  createEffect(() => {});
 
   return (
     <div>
@@ -51,28 +42,30 @@ export default function Customers() {
 
       <For each={store.customers}>
         {(person) => (
-          <div className="d-flex">
-            <Show when={person.id === currCustomerId() && hasOffers()}>
+          <>
+            <Show when={person.appointmentOffers.length}>
               <div style={s.badge}></div>
             </Show>
-            <p onClick={(e) => setCurrCustomerId(person.id)}>
-              {person.name} : {person.email}
-            </p>
-            <button
-              class="btn btn-danger"
-              onClick={(e) => {
-                removeCustomer(person.id);
-                setCurrCustomerId(null);
-              }}
-            >
-              X
-            </button>
-          </div>
+            <div className="d-flex">
+              <p onClick={(e) => setCurrCustomerId(person.id)}>
+                {person.name} : {person.email}
+              </p>
+              <button
+                class="btn btn-danger"
+                onClick={(e) => {
+                  removeCustomer(person.id);
+                  setCurrCustomerId(null);
+                }}
+              >
+                X
+              </button>
+            </div>
+          </>
         )}
       </For>
 
       <Show when={currCustomerId()}>
-        <CustomerDetails customer={currUser()} onClose={() => setCurrCustomerId(null)} />
+        <CustomerDetails customer={selectedCustomer()} onClose={() => setCurrCustomerId(null)} />
       </Show>
     </div>
   );

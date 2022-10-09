@@ -1,27 +1,8 @@
 import { createSignal, createEffect, onMount } from "solid-js";
 import { parseWeekday } from "./helpers";
-import { supabase } from "./supabaseClient";
-import AppointmentOffers from "./AppointmentOffers";
+import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
 
 export default function CustomerDetails(props) {
-  const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
-  const [isLoading, setIsLoading] = createSignal(true);
-
-  createEffect(async () => {
-    setIsLoading(true);
-
-    // getCustomerAppointmentOffers
-    const { data } = await supabase
-      .from("appointment_offers")
-      .select("*")
-      .eq("customer_id", props.customer.id);
-
-    setCustomerAppointmentOffers(data);
-
-    setIsLoading(false);
-  });
-
-  // appointment offers
   return (
     <>
       <button onClick={props.onClose}>X</button>
@@ -41,7 +22,7 @@ export default function CustomerDetails(props) {
         </For>
       </ul>
 
-      <AppointmentOffers offers={customerAppointmentOffers()} />
+      <CustomerAppointmentOffers offers={props.customer.appointmentOffers} />
     </>
   );
 }
