@@ -1,5 +1,6 @@
 import { createStore } from "solid-js/store";
 import { supabase } from "./supabaseClient";
+import { getProfessionalById, findCustomerIndexById, findProfessionalIndexById } from "./helpers";
 import {
   INITIAL_STORE,
   DEFAULT_CUSTOMER_AVAILABILITY,
@@ -199,6 +200,9 @@ const removeProfessional = async (id) => {
 };
 
 const createAppointmentOffers = async (customerId, offers) => {
+  if (!offers.length) {
+    return console.log("createAppointmentOffers with no offers! Abort it", { offers, customerId });
+  }
   console.log("createAppointmentOffers", { offers, customerId });
 
   // patch/remove previous offers
@@ -247,25 +251,30 @@ const confirmOffer = async (customerId, offer) => {
     .eq("customer_id", customerId)
     .select();
   if (deleteOfferError) {
-    console.log(deleteOfferError);
+    console.log({ deleteOfferError });
     return;
   }
 
   // 2. patch customer availability (status)
-  const { data: updatedCustomerAvail } = await supabase
+  const { data: updatedCustomerAvail, error: updateCAvError } = await supabase
     .from("customer_availability")
     .update({ status: "0" })
     .match({ customer_id: customerId, day: offer.day, time: offer.time })
     .select();
-
+  if (updateCAvError) {
+    console.log({ updateCAvError });
+    return;
+  }
   // 3. professional availability (status)
-  const { data: updatedProfAvail } = await supabase
+  const { data: updatedProfAvail, error: updatePAvError } = await supabase
     .from("professional_availability")
     .update({ status: "0" })
     .match({ professional_id: offer.professional_id, day: offer.day, time: offer.time })
     .select();
-
-  // 4. create appointment 🎉
+  if (updatePAvError) {
+    console.log({ updatePAvError });
+    return;
+  }
   const newAppointment = {
     customer_id: customerId,
     professional_id: offer.professional_id,
@@ -274,16 +283,65 @@ const confirmOffer = async (customerId, offer) => {
     datetime: offer.ISODate,
     status: "1",
   };
-  const { data, error } = await supabase
+
+  // 4. create appointment 🎉
+  const { data, error: appointmentError } = await supabase
     .from("realtime_appointments")
     .insert(newAppointment)
     .select();
+  if (appointmentError) {
+    console.log({ appointmentError });
+    return;
+  }
+  // update store
+  // 1. clear appointment_offers made to customer
+  setStore(
+    "customers",
+    findCustomerIndexById(customerId, store.customers),
+    "appointmentOffers",
+    (prev) => []
+  );
+  // 2. patch customer availability (status)
+  setStore(
+    "customers",
+    findCustomerIndexById(customerId, store.customers),
+    "availability",
+    (prev) =>
+      prev.map((av) => (av.id === updatedCustomerAvail[0].id ? updatedCustomerAvail[0] : av))
+  );
+  // 3. professional availability (status)
+  setStore(
+    "professionals",
+    findProfessionalIndexById(offer.professional_id, store.professionals),
+    "availability",
+    (prev) => prev.map((av) => (av.id === updatedProfAvail[0].id ? updatedProfAvail[0] : av))
+  );
+  // 4. create appointment 🎉
+  setStore("customers", findCustomerIndexById(customerId, store.customers), "appointments", [
+    newAppointment,
+  ]);
+  setStore(
+    "professionals",
+    findProfessionalIndexById(offer.professional_id, store.professionals),
+    "appointments",
+    [
+      ...getProfessionalById(offer.professional_id, store.professionals).appointments,
+      newAppointment,
+    ]
+  );
 
-  console.log({ newAppointment, data, deletedOffers, updatedCustomerAvail, updatedProfAvail });
-  // console.log({ deletedOffers, updatedCustomerAvail, updatedProfAvail, data });
+  console.log({
+    newAppointment,
+    data,
+    deletedOffers,
+    updatedCustomerAvail,
+    updatedProfAvail,
+    customerIdx: findCustomerIndexById(customerId, store.customers),
+  });
 
-  // 5. notify professional
+  // . notify professional??
 
+  // . send realtime event
   channel.send({
     type: "broadcast",
     event: "appointment_offer_confirmed_by_customer",

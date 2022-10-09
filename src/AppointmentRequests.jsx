@@ -32,7 +32,7 @@ export default function AppointmentRequests(props) {
 
       {/* <pre>{JSON.stringify(idleCustomers(), null, 2)}</pre> */}
 
-      <Show when={customerId()}>
+      <Show when={customerId() && currCustomer()}>
         <AvailabilityMatches customer={currCustomer()} onClose={() => setCustomerId(null)} />
       </Show>
     </div>

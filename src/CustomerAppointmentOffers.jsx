@@ -17,14 +17,14 @@ export default function CustomerAppointmentOffers(props) {
       // 1005 gambiarra javascript enquanto não escolhemos uma lib para datas
       .map((_, i) => new Date(closestPossibleDateTimestamp + (i + 1) * 7 * 24 * 60 * 60 * 1005));
 
-    console.log(parseWeekday(day), {
-      day,
-      today: new Date().getDay(),
-      daysFromFirstAppointment,
-      closestPossibleDate,
-      closestPossibleDates,
-      today,
-    });
+    // console.log(parseWeekday(day), {
+    //   day,
+    //   today: new Date().getDay(),
+    //   daysFromFirstAppointment,
+    //   closestPossibleDate,
+    //   closestPossibleDates,
+    //   today,
+    // });
 
     return closestPossibleDates;
   };

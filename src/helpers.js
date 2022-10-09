@@ -1,4 +1,5 @@
 import { ALL_TIMES } from "./constants";
+
 export const parseWeekday = (n) => {
   const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
   return weekdays[n];
@@ -68,7 +69,11 @@ export const getMergedAvailability = (slots) => {
 };
 
 export const getProfessionalById = (id, professionals) => professionals.find((p) => p.id === id);
+export const findProfessionalIndexById = (id, professionals) =>
+  professionals.findIndex((p) => p.id === id);
+
 export const getCustomerById = (id, customers) => customers.find((p) => p.id === id);
+export const findCustomerIndexById = (id, customers) => customers.findIndex((p) => p.id === id);
 
 export const getDiffFromNextSameWeekday = (weekday) => {
   const futureWeekday = weekday;
