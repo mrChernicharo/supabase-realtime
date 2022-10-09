@@ -1,5 +1,9 @@
-prevent customers from confirming appointment if there's an appointment
-at the same day/time with the same professional
+- cascade professional on staff delete
 
-invalidate appointment offers at the same time block for an involved professional
-once an offer is confirmed by customer
+- send realtime updates for:
+
+  - professional remove
+  - customer remove
+  - offer confirmed
+
+- update professional/customer availability
