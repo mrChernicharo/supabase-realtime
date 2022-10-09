@@ -1,8 +1,5 @@
-import { createSignal } from "solid-js";
-import { onMount } from "solid-js";
-import { loadProfessionalAvailability } from "./store";
+import { createSignal, createEffect } from "solid-js";
 import { parseWeekday, getWorkingHours, getMergedAvailability } from "./helpers";
-import { createEffect } from "solid-js";
 
 export default function EditProfessionalAvailability(props) {
   const workingHours = getWorkingHours({ min: "08:00", max: "20:00" });

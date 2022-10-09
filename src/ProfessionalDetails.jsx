@@ -1,6 +1,4 @@
-import { createSignal } from "solid-js";
-import { onMount } from "solid-js";
-import { loadProfessionalAvailability } from "./store";
+import { createSignal, onMount } from "solid-js";
 import { parseWeekday, getWorkingHours } from "./helpers";
 import EditProfessionalAvailability from "./EditProfessionalAvailability";
 

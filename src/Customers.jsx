@@ -2,11 +2,12 @@ import { Show } from "solid-js";
 import { createSignal } from "solid-js";
 import { store, addCustomer, removeCustomer } from "./store";
 import CustomerDetails from "./CustomerDetails";
+import { createMemo } from "solid-js";
 
 export default function Customers() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);
 
-  const currUser = () => store.customers.find((c) => c.id === currCustomerId());
+  const currUser = createMemo(() => store.customers.find((c) => c.id === currCustomerId()));
 
   return (
     <div>

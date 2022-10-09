@@ -7,25 +7,19 @@ const INITIAL_STORE = {
   staff: [],
 };
 const DEFAULT_CUSTOMER_AVAILABILITY = [
-  { customer_id: "", day: 1, time: "14:00" },
   { customer_id: "", day: 1, time: "14:30" },
   { customer_id: "", day: 1, time: "15:00" },
-  { customer_id: "", day: 1, time: "15:30" },
-  { customer_id: "", day: 3, time: "14:00" },
   { customer_id: "", day: 3, time: "14:30" },
   { customer_id: "", day: 3, time: "15:00" },
-  { customer_id: "", day: 3, time: "15:30" },
+  { customer_id: "", day: 5, time: "09:30" },
 ];
 
 const DEFAULT_PROFESSIONAL_AVAILABILITY = [
-  { professional_id: "", day: 1, time: "09:00" },
   { professional_id: "", day: 1, time: "09:30" },
   { professional_id: "", day: 1, time: "14:30" },
-  { professional_id: "", day: 1, time: "15:00" },
   { professional_id: "", day: 3, time: "10:00" },
-  { professional_id: "", day: 3, time: "14:30" },
   { professional_id: "", day: 3, time: "15:00" },
-  { professional_id: "", day: 3, time: "17:30" },
+  { professional_id: "", day: 5, time: "09:30" },
 ];
 
 const channel = supabase.channel("db-changes");
@@ -65,7 +59,7 @@ const addCustomer = async ({ name, email }) => {
     .select();
   if (err2) return console.log(err2);
 
-  const entry = { ...data[0], availability, appointments: [] };
+  const entry = { ...data[0], availability, appointments: [], appointmentOffers: [] };
 
   console.log("addCustomer", { entry });
   setStore("customers", (prev) => [...prev, entry]);
@@ -179,42 +173,14 @@ const removeProfessional = async (id) => {
   });
 };
 
-const loadCustomerAvailability = async (id) => {
-  const { data, error } = await supabase
-    .from("customer_availability")
-    .select("*")
-    .eq("customer_id", id);
-
-  if (error) {
-    console.log(error);
-    return [];
-  }
-
-  return data;
-};
-
-const loadProfessionalAvailability = async (id) => {
-  const { data, error } = await supabase
-    .from("professional_availability")
-    .select("*")
-    .eq("professional_id", id);
-
-  if (error) {
-    console.log(error);
-    return [];
-  }
-
-  return data;
-};
-
-const createAppointmentOffers = async (offers) => {
-  console.log("createAppointmentOffers", offers);
+const createAppointmentOffers = async (customerId, offers) => {
+  console.log("createAppointmentOffers", { offers, customerId });
 
   // patch/remove previous offers
   const { data: deletedData, error: deleteError } = await supabase
     .from("appointment_offers")
     .delete()
-    .eq("customer_id", offers[0].customer_id)
+    .eq("customer_id", customerId)
     .select();
 
   if (deleteError) {
@@ -228,6 +194,18 @@ const createAppointmentOffers = async (offers) => {
     console.log(error);
     return;
   }
+
+  console.log("appointment offer created", data);
+  setStore("customers", (prev) =>
+    prev.map((c) => (c.id === customerId ? { ...c, appointmentOffers: data } : c))
+  );
+
+  channel.send({
+    type: "broadcast",
+    event: "appointment_offer_created",
+    customerId,
+    entries: data,
+  });
 
   console.log({ data, deletedData });
 
@@ -265,6 +243,15 @@ const onProfessionalRemoved = (payload) => {
   setStore("professionals", (prev) => prev.filter((p) => p.id !== payload.entry.id));
 };
 
+const onOfferCreated = (payload) => {
+  console.log("onOfferCreated", { payload });
+  // setStore("customers", (prev) =>
+  //   payload.entries.map((c) =>
+  //     c.id === payload.customerId ? { ...c, appointmentOffers: payload.entries } : c
+  //   )
+  // );
+};
+
 // initial fetching (hydration)
 Promise.all([
   supabase
@@ -274,13 +261,18 @@ Promise.all([
   supabase
     .from("customers")
     .select(
-      "*, availability:customer_availability ( id, day, time, status ), appointments:realtime_appointments ( id, day, time, status )"
+      `*, 
+      availability:customer_availability ( id, day, time, status ), 
+      appointments:realtime_appointments ( id, day, time, status ),
+      appointmentOffers:appointment_offers ( id, day, time, professional_id )`
     )
     .then(({ data }) => setStore("customers", data)),
   supabase
     .from("professionals")
     .select(
-      "*, availability:professional_availability (id, day, time, status), appointments:realtime_appointments ( id, day, time, status )"
+      `*, 
+      availability:professional_availability (id, day, time, status), 
+      appointments:realtime_appointments ( id, day, time, status )`
     )
     .then(({ data }) => setStore("professionals", data)),
 ]);
@@ -293,6 +285,7 @@ channel
   .on("broadcast", { event: "staff_removed" }, onStaffRemoved)
   .on("broadcast", { event: "customer_removed" }, onCustomerRemoved)
   .on("broadcast", { event: "professional_removed" }, onProfessionalRemoved)
+  .on("broadcast", { event: "appointment_offer_created" }, onOfferCreated)
   .subscribe(console.log);
 
 export {
@@ -303,7 +296,5 @@ export {
   removeCustomer,
   removeProfessional,
   removeStaff,
-  loadCustomerAvailability,
-  loadProfessionalAvailability,
   createAppointmentOffers,
 };

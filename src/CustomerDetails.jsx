@@ -1,8 +1,5 @@
-import { createSignal } from "solid-js";
-import { onMount } from "solid-js";
-import { loadCustomerAvailability } from "./store";
+import { createSignal, createEffect, onMount } from "solid-js";
 import { parseWeekday } from "./helpers";
-import { createEffect } from "solid-js";
 import { supabase } from "./supabaseClient";
 import AppointmentOffers from "./AppointmentOffers";
 
@@ -11,7 +8,6 @@ export default function CustomerDetails(props) {
   const [isLoading, setIsLoading] = createSignal(true);
 
   createEffect(async () => {
-    console.log("heey", props.customer);
     setIsLoading(true);
 
     // getCustomerAppointmentOffers

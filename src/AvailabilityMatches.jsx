@@ -45,13 +45,15 @@ export default function AvailabilityMatches(props) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
     const selectedCheckboxes = [...e.currentTarget].filter((d) => d.checked);
+
     const selectedTimeBlocks = selectedCheckboxes.map((d) => ({
       ...d.dataset,
       customer_id: props.customer.id,
     }));
 
-    await createAppointmentOffers(selectedTimeBlocks);
+    await createAppointmentOffers(props.customer.id, selectedTimeBlocks);
   }
 
   createEffect(async () => {
