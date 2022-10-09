@@ -207,6 +207,10 @@ const loadProfessionalAvailability = async (id) => {
   return data;
 };
 
+const createAppointmentOffers = async (offers) => {
+  console.log("createAppointmentOffers", offers);
+};
+
 // realtime events handlers
 const onStaffAdded = (payload) => {
   console.log("staff_added", { payload });
@@ -278,4 +282,5 @@ export {
   removeStaff,
   loadCustomerAvailability,
   loadProfessionalAvailability,
+  createAppointmentOffers,
 };

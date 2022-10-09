@@ -1,5 +1,5 @@
 import { onMount, For, createMemo } from "solid-js";
-import { store } from "./store";
+import { store, createAppointmentOffers } from "./store";
 import { parseWeekday } from "./helpers";
 
 export default function AvailabilityMatches(props) {
@@ -33,6 +33,25 @@ export default function AvailabilityMatches(props) {
     return matchingAvailsByProfessional;
   });
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const selectedCheckboxes = [...e.currentTarget].filter((d) => d.checked);
+    const selectedTimeBlocks = selectedCheckboxes.map((d) => ({
+      ...d.dataset,
+      customer_id: props.customer.id,
+    }));
+
+    /**
+     * prof_id, day, time
+     */
+
+    console.log({ selectedCheckboxes });
+
+    // const selectedSlots = selectedCheckboxes.map((ch) => arr2[ch.profIdx][ch.slotIdx]);
+
+    await createAppointmentOffers(selectedTimeBlocks);
+  }
+
   return (
     <div>
       <button onClick={props.onClose}>X</button>
@@ -40,22 +59,37 @@ export default function AvailabilityMatches(props) {
       <h3>{props.customer.name}</h3>
       <p>{props.customer.email}</p>
 
-      <For each={Object.keys(availableMatches())}>
-        {(profId) => (
-          <div>
-            <h4>{getProfessional(profId).name}</h4>
+      <form onSubmit={handleSubmit}>
+        <For each={Object.keys(availableMatches())}>
+          {(profId, profIdx) => (
+            <div>
+              <h4>{getProfessional(profId).name}</h4>
 
-            <For each={availableMatches()[profId]}>
-              {(profAvail) => (
-                <div>
-                  {parseWeekday(profAvail.day)}
-                  {profAvail.time}
-                </div>
-              )}
-            </For>
-          </div>
-        )}
-      </For>
+              <For each={availableMatches()[profId]}>
+                {(block, i) => (
+                  <div>
+                    <label>
+                      {parseWeekday(block.day)} {block.time}{" "}
+                      <input
+                        type="checkbox"
+                        // data-hash={`${block.day} ${profId} ${block.time}`}
+                        // value={availableMatches()[profId][block.id]}
+                        data-professional-id={getProfessional(profId).id}
+                        data-day={block.day}
+                        data-time={block.time}
+                        // data-prof-idx={profIdx()}
+                        // data-slot-idx={i()}
+                      />
+                    </label>
+                  </div>
+                )}
+              </For>
+            </div>
+          )}
+        </For>
+
+        <button>Send</button>
+      </form>
     </div>
   );
 }

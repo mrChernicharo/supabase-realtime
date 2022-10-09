@@ -17,9 +17,16 @@ export default function EditProfessionalAvailability(props) {
       <h5>Edit professional availability</h5>
 
       <For each={currAvailability()}>
-        {(slot) => (
+        {(slot, i) => (
           <div>
-            <div>{parseWeekday(slot.day)}</div>
+            <div>{i() + 1}</div>
+
+            <select value={parseWeekday(slot.day)}>
+              <For each={[0, 1, 2, 3, 4, 5, 6]}>
+                {(day) => <option>{parseWeekday(day)}</option>}
+              </For>
+            </select>
+
             <select value={slot.start}>
               <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
             </select>
