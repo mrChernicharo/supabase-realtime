@@ -80,6 +80,7 @@ export default function AvailabilityMatches(props) {
 
       <h3>{props.customer.name}</h3>
       <p>{props.customer.email}</p>
+      <p>{props.customer.id}</p>
 
       <form onSubmit={handleSubmit}>
         <Show when={!isLoading()} fallback={<div>Loading...</div>}>

@@ -1,10 +1,10 @@
 import { onMount } from "solid-js";
+import { createSignal } from "solid-js";
 import { For, Show } from "solid-js";
 import { getProfessionalById, parseWeekday, getDiffFromNextSameWeekday } from "./helpers";
 import { store, confirmOffer } from "./store";
 
 export default function CustomerAppointmentOffers(props) {
-  let selectRef;
   const getPossibleDates = (day) => {
     const diff = getDiffFromNextSameWeekday(day);
     const daysFromFirstAppointment = diff < 2 ? diff + 7 : diff;
@@ -38,37 +38,41 @@ export default function CustomerAppointmentOffers(props) {
       {/* <pre>{JSON.stringify(props.offers, null, 2)}</pre> */}
       <Show when={!props.offers.length}>waiting admin offers...</Show>
       <For each={props.offers}>
-        {(offer) => (
-          <div>
-            <span>
-              {getProfessionalById(offer.professional_id, store.professionals).name.toUpperCase()}{" "}
-              {parseWeekday(offer.day)} {offer.time}
-            </span>
-            <details>
-              <summary></summary>
-              <label>start date</label>
-              <select
-                ref={selectRef}
-                value={getPossibleDates(offer.day)[0].toLocaleDateString("en")}
-              >
-                <For each={getPossibleDates(offer.day)}>
-                  {(date) => <option>{date.toLocaleDateString("en")}</option>}
-                </For>
-              </select>
-              <button
-                class="btn btn-success"
-                onClick={(e) => {
-                  confirmOffer(props.customerId, {
-                    ...offer,
-                    selectedDate: selectRef.value,
-                  });
-                }}
-              >
-                ✔ confirm
-              </button>
-            </details>
-          </div>
-        )}
+        {(offer) => {
+          const [selectRef, setSelectRef] = createSignal(null);
+          return (
+            <div>
+              <span>
+                {getProfessionalById(offer.professional_id, store.professionals).name.toUpperCase()}{" "}
+                {parseWeekday(offer.day)} {offer.time}
+              </span>
+              <details>
+                <summary></summary>
+                <label>start treatment at</label>
+
+                <select ref={setSelectRef} value={getPossibleDates(offer.day)[0].toDateString()}>
+                  <For each={getPossibleDates(offer.day)}>
+                    {(date) => <option>{date.toDateString()}</option>}
+                  </For>
+                </select>
+
+                <button
+                  class="btn btn-success"
+                  onClick={(e) => {
+                    console.log({ selectRef: selectRef() });
+                    confirmOffer(props.customerId, {
+                      ...offer,
+                      selectedDate: selectRef().value,
+                      ISODate: new Date(selectRef().value).toISOString(),
+                    });
+                  }}
+                >
+                  ✔ confirm
+                </button>
+              </details>
+            </div>
+          );
+        }}
       </For>
     </div>
   );

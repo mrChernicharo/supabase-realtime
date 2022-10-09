@@ -9,6 +9,7 @@ export default function CustomerDetails(props) {
       <button onClick={props.onClose}>X</button>
       <h2>{props.customer.name}</h2>
       <p>{props.customer.email}</p>
+      <p>{props.customer.id}</p>
 
       <h3>Customer Availability</h3>
       <ul style={s.ul}>

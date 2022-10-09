@@ -198,6 +198,51 @@ const createAppointmentOffers = async (customerId, offers) => {
 
 const confirmOffer = async (customerId, offer) => {
   console.log("confirmOffer", { customerId, offer });
+
+  // 1. clear appointment_offers made to customer
+  const { data: deletedOffers, error: deleteOfferError } = await supabase
+    .from("appointment_offers")
+    .delete()
+    .eq("customer_id", customerId)
+    .select();
+  if (deleteOfferError) {
+    console.log(deleteOfferError);
+    return;
+  }
+
+  // 2. patch customer availability (status)
+  const { data: updatedCustomerAvail } = await supabase
+    .from("customer_availability")
+    .update({ status: "0" })
+    .match({ customer_id: customerId, day: offer.day, time: offer.time })
+    .select();
+
+  // 3. professional availability (status)
+  const { data: updatedProfAvail } = await supabase
+    .from("professional_availability")
+    .update({ status: "0" })
+    .match({ professional_id: offer.professional_id, day: offer.day, time: offer.time })
+    .select();
+
+  // 4. create appointment 🎉
+  const newAppointment = {
+    customer_id: customerId,
+    professional_id: offer.professional_id,
+    day: offer.day,
+    time: offer.time,
+    datetime: offer.ISODate,
+    status: "1",
+  };
+  const { data, error } = await supabase
+    .from("realtime_appointments")
+    .insert(newAppointment)
+    .select();
+
+  console.log({ newAppointment, data, deletedOffers, updatedCustomerAvail, updatedProfAvail });
+  // console.log({ deletedOffers, updatedCustomerAvail, updatedProfAvail, data });
+
+  // 5. notify professional
+
   channel.send({
     type: "broadcast",
     event: "appointment_offer_confirmed_by_customer",
