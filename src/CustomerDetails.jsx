@@ -23,7 +23,10 @@ export default function CustomerDetails(props) {
         </For>
       </ul>
 
-      <CustomerAppointmentOffers offers={props.customer.appointmentOffers} />
+      <CustomerAppointmentOffers
+        customerId={props.customer.id}
+        offers={props.customer.appointmentOffers}
+      />
     </>
   );
 }

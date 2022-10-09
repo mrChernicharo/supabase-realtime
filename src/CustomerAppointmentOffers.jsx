@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 import { getProfessionalById, parseWeekday } from "./helpers";
-import { store } from "./store";
+import { store, confirmOffer } from "./store";
 
 export default function CustomerAppointmentOffers(props) {
   return (
@@ -15,7 +15,9 @@ export default function CustomerAppointmentOffers(props) {
               {getProfessionalById(offer.professional_id, store.professionals).name.toUpperCase()}{" "}
               {parseWeekday(offer.day)} {offer.time}
             </span>
-            <button class="btn btn-success">✔</button>
+            <button class="btn btn-success" onClick={(e) => confirmOffer(props.customerId, offer)}>
+              ✔
+            </button>
           </div>
         )}
       </For>

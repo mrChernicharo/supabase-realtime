@@ -212,6 +212,10 @@ const createAppointmentOffers = async (customerId, offers) => {
   // return data
 };
 
+const confirmOffer = async (customerId, offer) => {
+  console.log("confirmOffer", { customerId, offer });
+};
+
 // realtime events handlers
 const onStaffAdded = (payload) => {
   console.log("staff_added", { payload });
@@ -250,6 +254,10 @@ const onOfferCreated = (payload) => {
       c.id === payload.customerId ? { ...c, appointmentOffers: [...payload.entries] } : c
     )
   );
+};
+
+const onOfferConfirmed = (payload) => {
+  console.log("on offer confirmed", { payload });
 };
 
 // initial fetching (hydration)
@@ -297,4 +305,5 @@ export {
   removeProfessional,
   removeStaff,
   createAppointmentOffers,
+  confirmOffer,
 };
