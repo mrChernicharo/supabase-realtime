@@ -29,7 +29,7 @@ export default function Professionals() {
         )}
       </For>
 
-      <Show when={currProfessionalId()}>
+      <Show when={currProfessionalId() && currUser()}>
         <ProfessionalDetails
           professional={currUser()}
           onClose={() => setCurrProfessionalId(null)}

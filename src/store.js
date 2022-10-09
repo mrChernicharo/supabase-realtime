@@ -110,15 +110,73 @@ const addProfessional = async ({ name, email }) => {
 };
 
 const removeStaff = async (id) => {
+  const staffEntry = store.staff.find((s) => s.id === id);
+  const professional = store.professionals.find((p) => p.email === staffEntry.email);
+  console.log("removeStaff", { id, staffEntry, professional });
+  if (professional) {
+    console.log("remove professional!");
+    // 1. remove professional availability slots
+    const { data: removedProfessionalAvailability, error: err } = await supabase
+      .from("professional_availability")
+      .delete()
+      .match({ professional_id: professional.id })
+      .select();
+    if (err) return console.log(err);
+
+    // 2. remove professional appointments
+    const { data: removedAppointments, error: err1 } = await supabase
+      .from("realtime_appointments")
+      .delete()
+      .match({ professional_id: professional.id })
+      .select();
+    if (err1) return console.log(err1);
+
+    // 3. patch status of affected customer_availabilities
+    const availsToPatch = [];
+    removedAppointments.forEach((appointment) => {
+      const { customer_id, day, time } = appointment;
+      availsToPatch.push({ customer_id, day, time });
+    });
+    const [customerIds, days, times] = [
+      availsToPatch.map((o) => o.customer_id),
+      availsToPatch.map((o) => o.day),
+      availsToPatch.map((o) => o.time),
+    ];
+
+    let updatedCustomerAvails = null;
+    if (store.customers.length && customerIds.length && days.length && times.length) {
+      const { data, error: err3 } = await supabase
+        .from("customer_availability")
+        .update({ status: "1" })
+        .filter("customer_id", "in", `(${customerIds})`)
+        .filter("day", "in", `(${days})`)
+        .filter("time", "in", `(${times})`)
+        .select();
+
+      if (err3) return console.log({ err3 });
+      updatedCustomerAvails = data;
+    }
+
+    // 4. delete professional!
+    const { data: deletedProfessional, error } = await supabase
+      .from("professionals")
+      .delete()
+      .match({ id: professional.id })
+      .select();
+    if (error) return console.log(error);
+  }
+
   const { data, error } = await supabase.from("staff").delete().match({ id }).select();
   if (error) return console.log(error);
 
   const entry = data[0];
-  console.log("removeStaff", entry);
-  setStore(
-    "staff",
-    store.staff.filter((o) => o.id !== id)
-  );
+
+  fetchServer();
+
+  // setStore(
+  //   "staff",
+  //   store.staff.filter((o) => o.id !== id)
+  // );
 
   channel.send({
     type: "broadcast",
