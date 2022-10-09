@@ -1,5 +1,6 @@
 import { For } from "solid-js";
-import { parseWeekday } from "./helpers";
+import { getProfessionalById, parseWeekday } from "./helpers";
+import { store } from "./store";
 
 export default function AppointmentOffers(props) {
   return (
@@ -10,9 +11,10 @@ export default function AppointmentOffers(props) {
       <For each={props.offers}>
         {(offer) => (
           <div>
-            <p>{offer.professional_id}</p>
-            <p>{parseWeekday(offer.day)}</p>
-            <p>{offer.time}</p>
+            <p>{getProfessionalById(offer.professional_id, store.professionals).name}</p>
+            <p>
+              {parseWeekday(offer.day)} {offer.time}
+            </p>
           </div>
         )}
       </For>
