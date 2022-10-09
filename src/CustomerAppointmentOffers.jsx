@@ -11,10 +11,11 @@ export default function CustomerAppointmentOffers(props) {
       <For each={props.offers}>
         {(offer) => (
           <div>
-            <p>{getProfessionalById(offer.professional_id, store.professionals).name}</p>
-            <p>
+            <span>
+              {getProfessionalById(offer.professional_id, store.professionals).name.toUpperCase()}{" "}
               {parseWeekday(offer.day)} {offer.time}
-            </p>
+            </span>
+            <button class="btn btn-success">✔</button>
           </div>
         )}
       </For>

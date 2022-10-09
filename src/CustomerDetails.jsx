@@ -1,6 +1,7 @@
 import { createSignal, createEffect, onMount } from "solid-js";
 import { parseWeekday } from "./helpers";
 import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
+import { s } from "./styles";
 
 export default function CustomerDetails(props) {
   return (
@@ -10,13 +11,13 @@ export default function CustomerDetails(props) {
       <p>{props.customer.email}</p>
 
       <h3>Customer Availability</h3>
-      <ul>
+      <ul style={s.ul}>
         <For each={props.customer.availability}>
           {(timeBlock) => (
-            <li>
-              <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
+            <li style={s.li}>
+              <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
                 {parseWeekday(timeBlock.day)} {timeBlock.time}
-              </p>
+              </span>
             </li>
           )}
         </For>

@@ -4,16 +4,7 @@ import { store, addCustomer, removeCustomer } from "./store";
 import CustomerDetails from "./CustomerDetails";
 import { createMemo } from "solid-js";
 import { createEffect } from "solid-js";
-
-const s = {
-  badge: {
-    width: "12px",
-    height: "12px",
-    position: "absolute",
-    background: "red",
-    "border-radius": "50%",
-  },
-};
+import { s } from "./styles";
 
 export default function Customers() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);

@@ -245,11 +245,11 @@ const onProfessionalRemoved = (payload) => {
 
 const onOfferCreated = (payload) => {
   console.log("onOfferCreated", { payload });
-  // setStore("customers", (prev) =>
-  //   payload.entries.map((c) =>
-  //     c.id === payload.customerId ? { ...c, appointmentOffers: payload.entries } : c
-  //   )
-  // );
+  setStore("customers", (prev) =>
+    prev.map((c) =>
+      c.id === payload.customerId ? { ...c, appointmentOffers: [...payload.entries] } : c
+    )
+  );
 };
 
 // initial fetching (hydration)
