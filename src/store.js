@@ -128,23 +128,64 @@ const removeCustomer = async (id) => {
 };
 
 const removeProfessional = async (id) => {
-  const { data: removedAvailability, err } = await supabase
+  const { data: removedProfessionalAvailability, error: err } = await supabase
     .from("professional_availability")
     .delete()
     .match({ professional_id: id })
     .select();
   if (err) return console.log(err);
 
-  const { data, error } = await supabase
+  // remove professional appointments
+  const { data: removedAppointments, error: err1 } = await supabase
+    .from("realtime_appointments")
+    .delete()
+    .match({ professional_id: id })
+    .select();
+  if (err1) return console.log(err1);
+
+  const availsToPatch = [];
+  removedAppointments.forEach((appointment) => {
+    const { customer_id, day, time } = appointment;
+    availsToPatch.push({ customer_id, day, time });
+  });
+  const [customerIds, days, times] = [
+    availsToPatch.map((o) => o.customer_id),
+    availsToPatch.map((o) => o.day),
+    availsToPatch.map((o) => o.time),
+  ];
+
+  // patch customer_availabilities status back to 1
+  const { data: updatedCustomerAvails, error: err3 } = await supabase
+    .from("customer_availability")
+    .update({ status: "1" })
+    .filter("customer_id", "in", `(${customerIds})`)
+    .filter("day", "in", `(${days})`)
+    .filter("time", "in", `(${times})`)
+    .select();
+
+  if (err3) return console.log(err3);
+
+  const { data: deletedProfessional, error } = await supabase
     .from("professionals")
-    .delete({ cascade: true })
+    .delete()
     .match({ id })
     .select();
   if (error) return console.log(error);
 
-  const entry = data[0];
+  console.log({
+    deletedProfessional,
+    removedAppointments,
+    removedProfessionalAvailability,
+    updatedCustomerAvails,
+    availsToPatch,
+    customerIds,
+    days,
+    times,
+  });
 
-  console.log("remove Professional", entry, removedAvailability);
+  const entry = deletedProfessional[0];
+
+  console.log("remove Professional", entry, removedProfessionalAvailability);
   setStore(
     "professionals",
     store.professionals.filter((o) => o.id !== id)
@@ -306,7 +347,7 @@ Promise.all([
     .select(
       `*, 
       availability:customer_availability ( id, day, time, status ), 
-      appointments:realtime_appointments ( id, day, time, status ),
+      appointments:realtime_appointments ( id, professional_id, day, time, datetime, status ),
       appointmentOffers:appointment_offers ( id, day, time, professional_id )`
     )
     .then(({ data }) => setStore("customers", data)),
@@ -315,7 +356,7 @@ Promise.all([
     .select(
       `*, 
       availability:professional_availability (id, day, time, status), 
-      appointments:realtime_appointments ( id, day, time, status )`
+      appointments:realtime_appointments ( id, customer_id, day, time, datetime, status )`
     )
     .then(({ data }) => setStore("professionals", data)),
 ]);

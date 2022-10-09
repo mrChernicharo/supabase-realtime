@@ -1,6 +1,7 @@
 import { createSignal, onMount } from "solid-js";
-import { parseWeekday, getWorkingHours } from "./helpers";
+import { parseWeekday, getWorkingHours, getCustomerById } from "./helpers";
 import EditProfessionalAvailability from "./EditProfessionalAvailability";
+import { store } from "./store";
 
 export default function ProfessionalDetails(props) {
   return (
@@ -17,12 +18,26 @@ export default function ProfessionalDetails(props) {
               <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
                 {parseWeekday(timeBlock.day)} {timeBlock.time}
               </p>
+              {/* <pre>{JSON.stringify(timeBlock, null, 2)}</pre> */}
+              <pre>
+                {JSON.stringify(
+                  {
+                    ...props.professional.appointments
+                      .filter((app) => app.day === timeBlock.day && app.time === timeBlock.time)
+                      .map((res) => ({
+                        ...res,
+                        customer: getCustomerById(res.customer_id, store.customers).name,
+                      })),
+                  },
+                  null,
+                  2
+                )}
+              </pre>
             </li>
           )}
         </For>
       </ul>
-
-      {/* <pre>{JSON.stringify(mergeAvailability(props.professional.availability), null, 2)}</pre> */}
+      {/* <pre>{JSON.stringify(props.professional.appointments, null, 2)}</pre> */}
 
       <EditProfessionalAvailability availability={props.professional.availability} />
     </>
