@@ -321,7 +321,31 @@ const createAppointmentOffers = async (customerId, offers) => {
 const confirmOffer = async (customerId, offer) => {
   console.log("confirmOffer", { customerId, offer });
 
-  // 1. clear appointment_offers made to customer
+  // 1. clear appointment_offer to other customers
+  const offersToRemove = [];
+  store.customers.forEach((customer) => {
+    const offerToRemove = customer.appointmentOffers.find(
+      (o) =>
+        o.professional_id === offer.professional_id && o.day === offer.day && o.time === offer.time
+    );
+    if (offerToRemove) offersToRemove.push(offerToRemove);
+  });
+
+  console.log("clear appointment_offer to other customers", { offersToRemove });
+  for (const off of offersToRemove) {
+    const { data: deletedOff, error: deleteOffError } = await supabase
+      .from("appointment_offers")
+      .delete()
+      .match({ id: off.id })
+      .select();
+    if (deleteOffError) {
+      console.log({ deleteOffError });
+      return;
+    }
+    console.log({ deletedOff });
+  }
+
+  // 1.5 clear all appointment_offers made to customer
   const { data: deletedOffers, error: deleteOfferError } = await supabase
     .from("appointment_offers")
     .delete()
@@ -370,54 +394,56 @@ const confirmOffer = async (customerId, offer) => {
     console.log({ appointmentError });
     return;
   }
-  // update store
-  // 1. clear appointment_offers made to customer
-  setStore(
-    "customers",
-    findCustomerIndexById(customerId, store.customers),
-    "appointmentOffers",
-    (prev) => []
-  );
-  // 2. patch customer availability (status)
-  setStore(
-    "customers",
-    findCustomerIndexById(customerId, store.customers),
-    "availability",
-    (prev) =>
-      prev.map((av) => (av.id === updatedCustomerAvail[0].id ? updatedCustomerAvail[0] : av))
-  );
-  // 3. professional availability (status)
-  setStore(
-    "professionals",
-    findProfessionalIndexById(offer.professional_id, store.professionals),
-    "availability",
-    (prev) => prev.map((av) => (av.id === updatedProfAvail[0].id ? updatedProfAvail[0] : av))
-  );
-  // 4. create appointment 🎉
-  setStore("customers", findCustomerIndexById(customerId, store.customers), "appointments", [
-    newAppointment,
-  ]);
-  setStore(
-    "professionals",
-    findProfessionalIndexById(offer.professional_id, store.professionals),
-    "appointments",
-    [
-      ...getProfessionalById(offer.professional_id, store.professionals).appointments,
-      newAppointment,
-    ]
-  );
 
-  console.log({
-    newAppointment,
-    data,
-    deletedOffers,
-    updatedCustomerAvail,
-    updatedProfAvail,
-    customerIdx: findCustomerIndexById(customerId, store.customers),
-  });
+  // // update store
+  // // 1. clear appointment_offers made to customer
+  // setStore(
+  //   "customers",
+  //   findCustomerIndexById(customerId, store.customers),
+  //   "appointmentOffers",
+  //   (prev) => []
+  // );
+  // // 2. patch customer availability (status)
+  // setStore(
+  //   "customers",
+  //   findCustomerIndexById(customerId, store.customers),
+  //   "availability",
+  //   (prev) =>
+  //     prev.map((av) => (av.id === updatedCustomerAvail[0].id ? updatedCustomerAvail[0] : av))
+  // );
+  // // 3. professional availability (status)
+  // setStore(
+  //   "professionals",
+  //   findProfessionalIndexById(offer.professional_id, store.professionals),
+  //   "availability",
+  //   (prev) => prev.map((av) => (av.id === updatedProfAvail[0].id ? updatedProfAvail[0] : av))
+  // );
+  // // 4. create appointment 🎉
+  // setStore("customers", findCustomerIndexById(customerId, store.customers), "appointments", [
+  //   newAppointment,
+  // ]);
+  // setStore(
+  //   "professionals",
+  //   findProfessionalIndexById(offer.professional_id, store.professionals),
+  //   "appointments",
+  //   [
+  //     ...getProfessionalById(offer.professional_id, store.professionals).appointments,
+  //     newAppointment,
+  //   ]
+  // );
+
+  // console.log({
+  //   newAppointment,
+  //   data,
+  //   deletedOffers,
+  //   updatedCustomerAvail,
+  //   updatedProfAvail,
+  //   customerIdx: findCustomerIndexById(customerId, store.customers),
+  // });
 
   // . notify professional??
 
+  await fetchServer();
   // . send realtime event
   channel.send({
     type: "broadcast",
