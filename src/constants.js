@@ -1,5 +1,26 @@
 import { timeMinutesToStr, timeStrToMinutes } from "./helpers";
 
+export const INITIAL_STORE = {
+  professionals: [],
+  customers: [],
+  staff: [],
+};
+export const DEFAULT_CUSTOMER_AVAILABILITY = [
+  { customer_id: "", day: 1, time: "15:00" },
+  { customer_id: "", day: 2, time: "10:30" },
+  { customer_id: "", day: 3, time: "14:30" },
+  { customer_id: "", day: 3, time: "15:00" },
+  { customer_id: "", day: 5, time: "09:30" },
+];
+
+export const DEFAULT_PROFESSIONAL_AVAILABILITY = [
+  { professional_id: "", day: 1, time: "09:30" },
+  { professional_id: "", day: 1, time: "14:30" },
+  { professional_id: "", day: 3, time: "10:00" },
+  { professional_id: "", day: 3, time: "15:00" },
+  { professional_id: "", day: 5, time: "09:30" },
+];
+
 // prettier-ignore
 export const ALL_TIMES = ['00:00', '00:30',
  '01:00', '01:30', '02:00', '02:30', '03:00', '03:30',

@@ -1,26 +1,10 @@
 import { createStore } from "solid-js/store";
 import { supabase } from "./supabaseClient";
-
-const INITIAL_STORE = {
-  professionals: [],
-  customers: [],
-  staff: [],
-};
-const DEFAULT_CUSTOMER_AVAILABILITY = [
-  { customer_id: "", day: 1, time: "14:30" },
-  { customer_id: "", day: 1, time: "15:00" },
-  { customer_id: "", day: 3, time: "14:30" },
-  { customer_id: "", day: 3, time: "15:00" },
-  { customer_id: "", day: 5, time: "09:30" },
-];
-
-const DEFAULT_PROFESSIONAL_AVAILABILITY = [
-  { professional_id: "", day: 1, time: "09:30" },
-  { professional_id: "", day: 1, time: "14:30" },
-  { professional_id: "", day: 3, time: "10:00" },
-  { professional_id: "", day: 3, time: "15:00" },
-  { professional_id: "", day: 5, time: "09:30" },
-];
+import {
+  INITIAL_STORE,
+  DEFAULT_CUSTOMER_AVAILABILITY,
+  DEFAULT_PROFESSIONAL_AVAILABILITY,
+} from "./constants";
 
 const channel = supabase.channel("db-changes");
 
@@ -306,4 +290,5 @@ export {
   removeStaff,
   createAppointmentOffers,
   confirmOffer,
+  onOfferConfirmed,
 };

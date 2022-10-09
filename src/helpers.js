@@ -68,3 +68,18 @@ export const getMergedAvailability = (slots) => {
 };
 
 export const getProfessionalById = (id, professionals) => professionals.find((p) => p.id === id);
+
+export const getDiffFromNextSameWeekday = (weekday) => {
+  const futureWeekday = weekday;
+  const todayWeekday = new Date().getDay();
+  let dayDiff;
+
+  if (futureWeekday > todayWeekday) {
+    // same week
+    dayDiff = futureWeekday - todayWeekday;
+  } else {
+    // next week
+    dayDiff = futureWeekday + 7 - todayWeekday;
+  }
+  return dayDiff;
+};
