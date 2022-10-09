@@ -18,14 +18,14 @@ const DEFAULT_CUSTOMER_AVAILABILITY = [
 ];
 
 const DEFAULT_PROFESSIONAL_AVAILABILITY = [
-  { professional_id: "", day: 1, time: "14:00" },
+  { professional_id: "", day: 1, time: "09:00" },
+  { professional_id: "", day: 1, time: "09:30" },
   { professional_id: "", day: 1, time: "14:30" },
   { professional_id: "", day: 1, time: "15:00" },
-  { professional_id: "", day: 1, time: "15:30" },
-  { professional_id: "", day: 3, time: "14:00" },
+  { professional_id: "", day: 3, time: "10:00" },
   { professional_id: "", day: 3, time: "14:30" },
   { professional_id: "", day: 3, time: "15:00" },
-  { professional_id: "", day: 3, time: "15:30" },
+  { professional_id: "", day: 3, time: "17:30" },
 ];
 
 const channel = supabase.channel("db-changes");
