@@ -1,6 +1,6 @@
 import { onMount, For, createMemo } from "solid-js";
 import { store, createAppointmentOffers } from "./store";
-import { parseWeekday, getProfessionalById } from "./helpers";
+import { dateToWeekday, getProfessionalById } from "./helpers";
 import { supabase } from "./supabaseClient";
 import { createSignal } from "solid-js";
 import { createEffect } from "solid-js";
@@ -99,7 +99,7 @@ export default function AvailabilityMatches(props) {
                       {(block, i) => (
                         <div>
                           <label>
-                            {parseWeekday(block.day)} {block.time} {"  "}
+                            {dateToWeekday(block.day)} {block.time} {"  "}
                             <input
                               type="checkbox"
                               checked={isChecked(block)}

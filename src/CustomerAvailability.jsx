@@ -1,5 +1,5 @@
 import { store } from "./store";
-import { parseWeekday, getProfessionalById } from "./helpers";
+import { dateToWeekday, getProfessionalById } from "./helpers";
 import { s } from "./styles";
 
 export default function CustomerAvailability(props) {
@@ -26,7 +26,7 @@ export default function CustomerAvailability(props) {
           {(timeBlock) => (
             <li style={s.li}>
               <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
-                {parseWeekday(timeBlock.day)} {timeBlock.time}
+                {dateToWeekday(timeBlock.day)} {timeBlock.time}
               </span>
               <pre>{JSON.stringify(getCustomerAppointments(timeBlock), null, 2)}</pre>
             </li>

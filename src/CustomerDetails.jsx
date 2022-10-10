@@ -1,5 +1,5 @@
 import { createSignal, createEffect, onMount } from "solid-js";
-import { parseWeekday, getProfessionalById } from "./helpers";
+import { dateToWeekday, getProfessionalById } from "./helpers";
 import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
 import CustomerAvailability from "./CustomerAvailability";
 import { s } from "./styles";

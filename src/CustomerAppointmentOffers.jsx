@@ -1,7 +1,7 @@
 import { onMount } from "solid-js";
 import { createSignal } from "solid-js";
 import { For, Show } from "solid-js";
-import { getProfessionalById, parseWeekday, getDiffFromNextSameWeekday } from "./helpers";
+import { getProfessionalById, dateToWeekday, getDiffFromNextSameWeekday } from "./helpers";
 import { store, confirmOffer } from "./store";
 
 export default function CustomerAppointmentOffers(props) {
@@ -17,7 +17,7 @@ export default function CustomerAppointmentOffers(props) {
       // 1005 gambiarra javascript enquanto não escolhemos uma lib para datas
       .map((_, i) => new Date(closestPossibleDateTimestamp + (i + 1) * 7 * 24 * 60 * 60 * 1005));
 
-    // console.log(parseWeekday(day), {
+    // console.log(dateToWeekday(day), {
     //   day,
     //   today: new Date().getDay(),
     //   daysFromFirstAppointment,
@@ -45,7 +45,7 @@ export default function CustomerAppointmentOffers(props) {
             <div>
               <span>
                 {getProfessionalById(offer.professional_id, store.professionals).name.toUpperCase()}{" "}
-                {parseWeekday(offer.day)} {offer.time}
+                {dateToWeekday(offer.day)} {offer.time}
               </span>
               <details>
                 <summary></summary>
