@@ -2,6 +2,7 @@ import { createSignal, Show, createEffect, createMemo } from "solid-js";
 import { store, removeCustomer } from "./store";
 import CustomerDetails from "./CustomerDetails";
 import Badge from "./Badge";
+import Icon from "./Icon";
 
 export default function CustomersList() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);
@@ -36,7 +37,7 @@ export default function CustomersList() {
                   setCurrCustomerId(null);
                 }}
               >
-                X
+                <Icon trash />
               </button>
             </div>
           </Show>

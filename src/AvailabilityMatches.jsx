@@ -1,11 +1,9 @@
-import { onMount, For, createMemo } from "solid-js";
+import { createEffect, createSignal, For, createMemo } from "solid-js";
 import { store, createAppointmentOffers } from "./store";
 import { dateToWeekday, getProfessionalById } from "./helpers";
 import { supabase } from "./supabaseClient";
-import { createSignal } from "solid-js";
-import { createEffect } from "solid-js";
-import { onCleanup } from "solid-js";
 import { Show } from "solid-js";
+import Icon from "./Icon";
 
 export default function AvailabilityMatches(props) {
   const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
@@ -76,7 +74,9 @@ export default function AvailabilityMatches(props) {
 
   return (
     <div>
-      <button onClick={props.onClose}>X</button>
+      <button onClick={props.onClose}>
+        <Icon close />
+      </button>
 
       <h3>{props.customer.name}</h3>
       <p>{props.customer.email}</p>

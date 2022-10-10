@@ -7,6 +7,7 @@ import {
   dateToWeekday,
   getDiffFromNextSameWeekday,
 } from "./helpers";
+import Icon from "./Icon";
 import { store, confirmOffer } from "./store";
 
 export default function CustomerAppointmentOffers(props) {
@@ -16,25 +17,13 @@ export default function CustomerAppointmentOffers(props) {
     const today = new Date().setHours(0, 0, 0);
     const closestPossibleDateTimestamp = today + daysFromFirstAppointment * 24 * 60 * 60 * 1000;
 
-    const closestPossibleDate = new Date(closestPossibleDateTimestamp);
     const closestPossibleDates = Array(4)
       .fill("")
       // 1005 gambiarra javascript enquanto não escolhemos uma lib para datas
       .map((_, i) => new Date(closestPossibleDateTimestamp + (i + 1) * 7 * 24 * 60 * 60 * 1005));
 
-    // console.log(dateToWeekday(day), {
-    //   day,
-    //   today: new Date().getDay(),
-    //   daysFromFirstAppointment,
-    //   closestPossibleDate,
-    //   closestPossibleDates,
-    //   today,
-    // });
-
     return closestPossibleDates;
   };
-
-  onMount(() => {});
 
   return (
     <div>
@@ -82,7 +71,7 @@ export default function CustomerAppointmentOffers(props) {
                     });
                   }}
                 >
-                  ✔ confirm
+                  <Icon check /> confirm appointment
                 </button>
               </details>
             </div>

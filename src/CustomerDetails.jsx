@@ -6,6 +6,7 @@ import { s } from "./styles";
 import { Show } from "solid-js";
 import { store } from "./store";
 import Badge from "./Badge";
+import Icon from "./Icon";
 
 export default function CustomerDetails(props) {
   const noAppointments = () => !props.customer.appointments.length;
@@ -17,7 +18,9 @@ export default function CustomerDetails(props) {
 
   return (
     <>
-      <button onClick={props.onClose}>X</button>
+      <button onClick={props.onClose}>
+        <Icon close />
+      </button>
       <h2>
         <Badge
           success={haveAppointments(props.customer)}

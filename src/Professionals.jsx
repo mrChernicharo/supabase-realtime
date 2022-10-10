@@ -1,6 +1,7 @@
 import { createSignal, createEffect } from "solid-js";
 import { store, removeProfessional } from "./store";
 import ProfessionalDetails from "./ProfessionalDetails";
+import Icon from "./Icon";
 
 export default function Professionals() {
   const [currProfessionalId, setCurrProfessionalId] = createSignal(null);
@@ -23,7 +24,7 @@ export default function Professionals() {
                 setCurrProfessionalId(null);
               }}
             >
-              X
+              <Icon close />
             </button>
           </div>
         )}

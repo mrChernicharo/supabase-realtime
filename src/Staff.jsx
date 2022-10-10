@@ -1,5 +1,6 @@
 import { createEffect, createSignal } from "solid-js";
 import { store, addProfessional, addStaff, removeStaff } from "./store";
+import Icon from "./Icon";
 
 export default function Staff() {
   const [selectedStaffId, setSelectedStaffId] = createSignal(null);
@@ -35,14 +36,16 @@ export default function Staff() {
                 setSelectedStaffId(null);
               }}
             >
-              X
+              <Icon close />
             </button>
           </div>
         )}
       </For>
 
       <Show when={selectedStaffId() && currUser()}>
-        <button onClick={(e) => setSelectedStaffId(null)}>X</button>
+        <button onClick={(e) => setSelectedStaffId(null)}>
+          <Icon close />
+        </button>
         <h3>{currUser().name}</h3>
         <p>{currUser().email}</p>
         <button onClick={(e) => addProfessional(currUser())}>Create Professional</button>
