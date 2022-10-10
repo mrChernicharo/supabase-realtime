@@ -1,5 +1,5 @@
 import { createSignal, onMount } from "solid-js";
-import { parseWeekday, getWorkingHours, getCustomerById } from "./helpers";
+import { parseWeekday, getCustomerById } from "./helpers";
 import EditProfessionalAvailability from "./EditProfessionalAvailability";
 import { store } from "./store";
 import { s } from "./styles";
@@ -16,9 +16,9 @@ export default function ProfessionalDetails(props) {
         <For each={props.professional.availability}>
           {(timeBlock) => (
             <li style={s.li}>
-              <p style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
+              <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
                 {parseWeekday(timeBlock.day)} {timeBlock.time}
-              </p>
+              </span>
               {/* <pre>{JSON.stringify(timeBlock, null, 2)}</pre> */}
               <pre>
                 {JSON.stringify(
