@@ -11,9 +11,10 @@ import { updateProfessionalAvailability } from "./store";
 const workingHours = getWorkingHours({ min: "08:00", max: "20:00" });
 
 function DayTimeRangeField(props) {
+  console.log({ props, v: dateToWeekday(+props.slot.day) });
   return (
     <div>
-      <select value={dateToWeekday(props.slot.day)}>
+      <select value={dateToWeekday(+props.slot.day)}>
         <For each={[0, 1, 2, 3, 4, 5, 6]}>{(day) => <option>{dateToWeekday(day)}</option>}</For>
       </select>
 
@@ -24,6 +25,10 @@ function DayTimeRangeField(props) {
       <select value={props.slot.end}>
         <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
       </select>
+
+      <button type="button" class="btn btn-danger" onClick={(e) => props.onDelete(props.slot)}>
+        X
+      </button>
     </div>
   );
 }
@@ -34,6 +39,8 @@ export default function EditProfessionalAvailability(props) {
   const [additionalSlots, setAdditionalSlots] = createSignal([DEFAULT_SLOT]);
 
   const isAppointment = (o) => o.id;
+
+  const haveSameDateAndTime = (a, b) => a.day === b.day && a.start === b.start && a.end === b.end;
 
   function handleSubmitAvailabilityRanges(e) {
     e.preventDefault();
@@ -105,26 +112,49 @@ export default function EditProfessionalAvailability(props) {
     setCurrAvailability(mergeAvailabilityArrayIntoRanges(props.availability));
   });
 
+  createEffect(() => {
+    console.log(additionalSlots());
+  });
+
   return (
     <div>
       <h5>Edit professional availability</h5>
       <form onSubmit={handleSubmitAvailabilityRanges} ref={addAvailabilityRangeFormRef}>
-        <For each={currAvailability()}>{(slot, i) => <DayTimeRangeField slot={slot} />}</For>
-        <div>
+        <For each={currAvailability()}>
+          {(slot, idx) => (
+            <DayTimeRangeField
+              slot={slot}
+              onDelete={(val) => {
+                console.log("delete", val);
+                console.log("delete", { val, idx: idx() }, currAvailability());
+                const filtered = currAvailability().filter((s, i) => idx() !== i);
+                setCurrAvailability((prev) => filtered);
+              }}
+            />
+          )}
+        </For>
+        <div style={{ padding: ".5rem", background: "#eee" }}>
           <For each={additionalSlots()}>
-            {(slot, i) => (
-              <div>
-                <div>add new</div>
-                <DayTimeRangeField slot={slot} />
-              </div>
+            {(slot, idx) => (
+              <DayTimeRangeField
+                slot={slot}
+                onDelete={(val) => {
+                  console.log("delete", { val, idx: idx() }, additionalSlots());
+                  const filtered = additionalSlots().filter((s, i) => idx() !== i);
+                  setAdditionalSlots((prev) => filtered);
+                }}
+              />
             )}
           </For>
 
           <button
             type="button"
-            onClick={(e) => setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT])}
+            onClick={(e) => {
+              console.log("add slot");
+              setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT]);
+            }}
           >
-            Add
+            +
           </button>
         </div>
         <button>Submit</button>
