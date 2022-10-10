@@ -18,6 +18,7 @@ export default function ProfessionalDetails(props) {
       />
 
       <EditProfessionalAvailability
+        professionalId={props.professional.id}
         appointments={props.professional.appointments}
         availability={props.professional.availability}
       />

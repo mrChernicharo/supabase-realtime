@@ -33,7 +33,6 @@ const fetchServer = async () =>
   ]);
 
 const channel = supabase.channel("db-changes");
-
 const [store, setStore] = createStore(INITIAL_STORE);
 
 const dbHandleDeleteProfessional = async (id) => {
@@ -416,8 +415,41 @@ const confirmOffer = async (customerId, offer) => {
   });
 };
 
-const updateProfessionalAvailability = async (availabilities) => {
-  console.log("updateProfessionalAvailability", { availabilities });
+const updateProfessionalAvailability = async (professionalId, availabilities) => {
+  const dbReadyAvailabilities = availabilities.map((d) => ({
+    ...d,
+    professional_id: professionalId,
+  }));
+  console.log("updateProfessionalAvailability", { dbReadyAvailabilities });
+
+  const { data: oldAvailability, error: deleteError } = await supabase
+    .from("professional_availability")
+    .delete()
+    .match({ professional_id: professionalId })
+    .select();
+  if (deleteError) {
+    console.log({ deleteError });
+    return;
+  }
+
+  const { data: newAvailability, error: insertError } = await supabase
+    .from("professional_availability")
+    .insert(dbReadyAvailabilities)
+    .select();
+  if (insertError) {
+    console.log({ insertError });
+    return;
+  }
+
+  channel.send({
+    type: "broadcast",
+    event: "professional_availability_updated",
+    entries: newAvailability,
+    professionalId,
+  });
+
+  console.log({ oldAvailability, newAvailability });
+  fetchServer();
 };
 
 // realtime events handlers
@@ -464,6 +496,10 @@ const onAppointmentOfferConfirmed = (payload) => {
   console.log("appointment offer confirmed by customer", { payload });
 };
 
+const onProfessionalAvailabilityUpdated = (payload) => {
+  console.log("professional availability updated", { payload });
+};
+
 // initial fetching (hydration)
 fetchServer();
 
@@ -478,6 +514,8 @@ channel
   .on("broadcast", { event: "professional_removed" }, onProfessionalRemoved)
   .on("broadcast", { event: "appointment_offer_created" }, onAppointmentOfferCreated)
   .on("broadcast", { event: "appointment_offer_confirmed_by_customer" }, onAppointmentOfferConfirmed)
+  .on("broadcast", { event: "professional_availability_updated" }, onProfessionalAvailabilityUpdated)
+  
   .subscribe(console.log);
 
 export {

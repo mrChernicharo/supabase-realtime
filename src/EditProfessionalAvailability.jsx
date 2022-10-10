@@ -4,8 +4,6 @@ import {
   getWorkingHours,
   mergeAvailabilityArrayIntoRanges,
   parseAvailabilityRangesIntoArray,
-  timeStrToMinutes,
-  getProfessionalById,
 } from "./helpers";
 import { DEFAULT_SLOT } from "./constants";
 import { updateProfessionalAvailability } from "./store";
@@ -34,7 +32,6 @@ export default function EditProfessionalAvailability(props) {
   let addAvailabilityRangeFormRef;
   const [currAvailability, setCurrAvailability] = createSignal([]);
   const [additionalSlots, setAdditionalSlots] = createSignal([DEFAULT_SLOT]);
-  // const [newSlot, setNewSlot] = createSignal(DEFAULT_SLOT);
 
   const isAppointment = (o) => o.id;
 
@@ -59,7 +56,6 @@ export default function EditProfessionalAvailability(props) {
 
     // figure out the status of each cleanArr element. Merge appointments encompassed
     // in the new availability list
-
     const newAvailPlusExistingAppointments = [...newAvailability, ...props.appointments];
     const pushedAppointmentsIds = [];
 
@@ -69,12 +65,11 @@ export default function EditProfessionalAvailability(props) {
         .find((o) => o.time === slot.time && o.day === slot.day);
 
       if (actualAppointmentAtSameTime) {
-        console.log("repeated", slot);
+        // console.log("repeated slot");
         newAvailability[i] = actualAppointmentAtSameTime;
         pushedAppointmentsIds.push(actualAppointmentAtSameTime.id);
       }
     }
-
     // push remaining appointments
     const remainingAppointments = props.appointments.filter(
       (ap) => !pushedAppointmentsIds.includes(ap.id)
@@ -90,19 +85,20 @@ export default function EditProfessionalAvailability(props) {
       status: isAppointment(d) ? "0" : "1",
     }));
 
-    console.log({
-      newAvailPlusExistingAppointments,
-      availabilityRanges,
-      mergedAvailability,
-      newAvailability,
-      remainingAppointments,
-      currAvailability: props.availability,
-      currAppointments: props.appointments,
-      newAvailabilityWithPrevAppointments,
-      parsedNewAvailability,
-    });
+    // console.log({
+    //   newAvailPlusExistingAppointments,
+    //   availabilityRanges,
+    //   mergedAvailability,
+    //   newAvailability,
+    //   remainingAppointments,
+    //   currAvailability: props.availability,
+    //   currAppointments: props.appointments,
+    //   newAvailabilityWithPrevAppointments,
+    //   parsedNewAvailability,
+    // });
 
-    return parsedNewAvailability;
+    // do that DB call!
+    updateProfessionalAvailability(props.professionalId, parsedNewAvailability);
   }
 
   createEffect(() => {

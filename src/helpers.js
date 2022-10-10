@@ -81,7 +81,6 @@ export const mergeAvailabilityArrayIntoRanges = (slots) => {
 
 export const sliceSuperposeRanges = (messyDayRanges) => {
   if (!messyDayRanges[0].day) return [];
-  // console.log("==========", messyDayRanges[0].day.toUpperCase(), { messyDayRanges });
 
   // range: { day: 'tuesday', start: '10:00', end: '16:00' }
   const messyNumericRanges = messyDayRanges.map((r) => ({
@@ -105,7 +104,6 @@ export const sliceSuperposeRanges = (messyDayRanges) => {
   }
 
   const slicedTimes = Array.from(set);
-  console.log(slicedTimes, set, messyNumericRanges, slicedTimes.map(timeMinutesToStr));
   return [...slicedTimes.map(timeMinutesToStr).sort()];
 };
 
@@ -119,7 +117,6 @@ export const parseAvailabilityRangesIntoArray = (ranges) => {
   const cleanArr = [];
   Object.keys(rangesByDay).forEach((weekday) => {
     const stringDayAvails = sliceSuperposeRanges(rangesByDay[weekday]);
-    // console.log(stringDayAvails);
 
     cleanArr.push(
       ...stringDayAvails.map((time) => ({
