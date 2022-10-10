@@ -1,49 +1,38 @@
 import { createSignal, createEffect, onMount } from "solid-js";
 import { parseWeekday, getProfessionalById } from "./helpers";
 import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
+import CustomerAvailability from "./CustomerAvailability";
 import { s } from "./styles";
 import { Show } from "solid-js";
 import { store } from "./store";
+import Badge from "./Badge";
 
 export default function CustomerDetails(props) {
   const noAppointments = () => !props.customer.appointments.length;
 
+  const isBrandNewUser = (person) =>
+    !person.appointments.length && !person.appointmentOffers.length;
+  const hasOffers = (person) => person.appointmentOffers.length;
+  const haveAppointments = (person) => person.appointments.length;
+
   return (
     <>
       <button onClick={props.onClose}>X</button>
-      <h2>{props.customer.name}</h2>
+      <h2>
+        <Badge
+          success={haveAppointments(props.customer)}
+          warn={hasOffers(props.customer)}
+          danger={isBrandNewUser(props.customer)}
+        />
+        {props.customer.name}
+      </h2>
       <p>{props.customer.email}</p>
       <p>{props.customer.id}</p>
 
-      <h3>Customer Availability</h3>
-      <ul style={s.ul}>
-        <For each={props.customer.availability}>
-          {(timeBlock) => (
-            <li style={s.li}>
-              <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
-                {parseWeekday(timeBlock.day)} {timeBlock.time}
-              </span>
-              <pre>
-                {JSON.stringify(
-                  props.customer.appointments
-                    .filter(
-                      (appointment) =>
-                        appointment.day === timeBlock.day && appointment.time === timeBlock.time
-                    )
-                    .map((res) => ({
-                      ...res,
-                      professional_name: res.professional_id
-                        ? getProfessionalById(res?.professional_id, store.professionals)?.name
-                        : "",
-                    })),
-                  null,
-                  2
-                )}
-              </pre>
-            </li>
-          )}
-        </For>
-      </ul>
+      <CustomerAvailability
+        availability={props.customer.availability}
+        appointments={props.customer.appointments}
+      />
 
       <Show when={noAppointments()}>
         <CustomerAppointmentOffers
