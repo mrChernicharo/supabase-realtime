@@ -15,10 +15,6 @@ export default function AppointmentRequests(props) {
   };
   const currCustomer = () => idleCustomers().find((c) => c.id === customerId());
 
-  // appointmentRequest customer matchingProfessionalAvailabilities
-  // fetch all professionals availabilities
-  // filter matching availabilities
-
   return (
     <Show when={store.customers.length}>
       <div style={{ border: "1px dashed" }}>
