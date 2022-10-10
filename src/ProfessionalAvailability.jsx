@@ -1,6 +1,8 @@
 import { store } from "./store";
 import { dateToWeekday, getCustomerById } from "./helpers";
 import { s } from "./styles";
+import { Show } from "solid-js";
+import AppointmentCard from "./AppointmentCard";
 
 export default function ProfessionalAvailability(props) {
   const getCustomerName = (id) => getCustomerById(id, store.customers)?.name;
@@ -26,7 +28,12 @@ export default function ProfessionalAvailability(props) {
               <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
                 {dateToWeekday(timeBlock.day)} {timeBlock.time}
               </span>
-              <pre>{JSON.stringify(getProfessionalAppointments(timeBlock), null, 2)}</pre>
+
+              <Show when={getProfessionalAppointments(timeBlock).length}>
+                <pre>{JSON.stringify(getProfessionalAppointments(timeBlock), null, 2)}</pre>
+
+                <AppointmentCard appointment={getProfessionalAppointments(timeBlock)[0]} />
+              </Show>
             </li>
           )}
         </For>

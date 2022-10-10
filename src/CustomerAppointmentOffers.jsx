@@ -1,7 +1,12 @@
 import { onMount } from "solid-js";
 import { createSignal } from "solid-js";
 import { For, Show } from "solid-js";
-import { getProfessionalById, dateToWeekday, getDiffFromNextSameWeekday } from "./helpers";
+import {
+  timeStrToMinutes,
+  getProfessionalById,
+  dateToWeekday,
+  getDiffFromNextSameWeekday,
+} from "./helpers";
 import { store, confirmOffer } from "./store";
 
 export default function CustomerAppointmentOffers(props) {
@@ -60,11 +65,20 @@ export default function CustomerAppointmentOffers(props) {
                 <button
                   class="btn btn-success"
                   onClick={(e) => {
-                    console.log({ selectRef: selectRef() });
+                    // console.log({ selectRef: selectRef() });
+                    const date = selectRef().value;
+
+                    const ISODate = new Date(
+                      new Date(date).getTime() +
+                        timeStrToMinutes(offer.time) * 60 * 1000 -
+                        new Date(date).getTimezoneOffset() * 60 * 1000
+                    ).toISOString();
+
+                    // console.log({ ISODate });
                     confirmOffer(props.customerId, {
                       ...offer,
-                      selectedDate: selectRef().value,
-                      ISODate: new Date(selectRef().value).toISOString(),
+                      selectedDate: date,
+                      ISODate,
                     });
                   }}
                 >
