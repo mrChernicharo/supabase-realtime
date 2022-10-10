@@ -416,6 +416,10 @@ const confirmOffer = async (customerId, offer) => {
   });
 };
 
+const updateProfessionalAvailability = async (availabilities) => {
+  console.log("updateProfessionalAvailability", { availabilities });
+};
+
 // realtime events handlers
 const onStaffAdded = (payload) => {
   console.log("staff_added", { payload });
@@ -486,4 +490,5 @@ export {
   removeStaff,
   createAppointmentOffers,
   confirmOffer,
+  updateProfessionalAvailability,
 };

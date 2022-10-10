@@ -1,5 +1,5 @@
 import { createSignal, onMount } from "solid-js";
-import { dateToWeekday, getCustomerById } from "./helpers";
+import { dateToWeekday, getCustomerById, getProfessionalById } from "./helpers";
 import EditProfessionalAvailability from "./EditProfessionalAvailability";
 import ProfessionalAvailability from "./ProfessionalAvailability";
 import { store } from "./store";
@@ -17,7 +17,10 @@ export default function ProfessionalDetails(props) {
         appointments={props.professional.appointments}
       />
 
-      <EditProfessionalAvailability availability={props.professional.availability} />
+      <EditProfessionalAvailability
+        appointments={props.professional.appointments}
+        availability={props.professional.availability}
+      />
     </div>
   );
 }

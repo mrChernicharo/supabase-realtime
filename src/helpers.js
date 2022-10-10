@@ -5,8 +5,8 @@ export const dateToWeekday = (n) => {
   return weekdays[n];
 };
 export const weekdayToDate = (weekday) => {
-  return ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"].indexOf(
-    weekday
+  return ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"].findIndex(
+    (day) => day === weekday
   );
 };
 
@@ -79,108 +79,34 @@ export const mergeAvailabilityArrayIntoRanges = (slots) => {
   return res;
 };
 
-const getOverlapTypes = (a, b) => {
-  let overlapTypes = [];
-
-  // encompass
-  if (a.start <= b.start && a.start <= b.end && a.end >= b.start && a.end >= b.end) {
-    overlapTypes.push("encompass");
-  }
-
-  // fit inside
-  if (a.start >= b.start && a.start <= b.end && a.end >= b.start && a.end <= b.end) {
-    overlapTypes.push("fit");
-  }
-  // start overlap
-  if (a.start <= b.start && a.start <= b.end && a.end >= b.start && a.end <= b.end)
-    overlapTypes.push("start");
-
-  // end overlap
-  if (a.start >= b.start && a.start <= b.end && a.end >= b.start && a.end >= b.end)
-    overlapTypes.push("end");
-
-  return overlapTypes;
-};
-
-export const superposeRanges = (messyDayRanges) => {
+export const sliceSuperposeRanges = (messyDayRanges) => {
   if (!messyDayRanges[0].day) return [];
-  console.log("superposeRanges=================", messyDayRanges[0].day.toUpperCase(), {
-    messyDayRanges,
-  });
-  // range: { day: 'tuesday', start: '10:00', end: '16:00' }
-  // array of ranges. merge slots to clean the superposing
+  // console.log("==========", messyDayRanges[0].day.toUpperCase(), { messyDayRanges });
 
+  // range: { day: 'tuesday', start: '10:00', end: '16:00' }
   const messyNumericRanges = messyDayRanges.map((r) => ({
-    day: weekdayToDate(r.day),
+    day: r.day,
     start: timeStrToMinutes(r.start),
     end: timeStrToMinutes(r.end),
+    // status: r.status
   }));
 
-  const mergedNumRanges = [];
-  console.log([...mergedNumRanges]);
+  const set = new Set();
 
-  for (let i = 0; i < messyNumericRanges.length; i++) {
-    let overlap = false;
-    console.log(i);
+  for (let range of messyNumericRanges) {
+    let s = range.start;
+    let e = range.end - 30;
 
-    for (let j = 0; j < mergedNumRanges.length; j++) {
-      // console.log(i, j);
-      // console.log("overlap?", i, j, getOverlapTypes(messyNumericRanges[i], mergedNumRanges[j]));
-      // they overlap?
-      //    merge, return
-      const overlaps = () => getOverlapTypes(messyNumericRanges[i], mergedNumRanges[j]);
-      if (overlaps().length) {
-        overlap = true;
-
-        console.log(
-          "overlap!!!!!!!",
-          getOverlapTypes(messyNumericRanges[i], mergedNumRanges[j]),
-          messyNumericRanges[i],
-          mergedNumRanges[j]
-        );
-        if (overlaps().includes("encompass")) {
-          mergedNumRanges[j].start = messyNumericRanges[i].start;
-          mergedNumRanges[j].end = messyNumericRanges[i].end;
-          break;
-        }
-        if (overlaps().includes("fit")) {
-          break;
-        }
-        if (overlaps().includes("start")) {
-          mergedNumRanges[j].start = messyNumericRanges[i].start;
-          break;
-        }
-        if (overlaps().includes("end")) {
-          mergedNumRanges[j].end = messyNumericRanges[i].end;
-          break;
-        }
-      }
+    while (s <= e) {
+      // console.log(range, s);
+      set.add(s);
+      s += 30;
     }
-
-    // no overlap?
-    //    push
-    if (!overlap) {
-      console.log("no overlaps", messyNumericRanges[i]);
-      mergedNumRanges.push(messyNumericRanges[i]);
-    }
-
-    console.log([...mergedNumRanges]);
   }
-  console.log({
-    messyDayRanges,
-    mergedNumRanges,
-    messyNumericRanges,
-    readable: mergedNumRanges.map((o) => ({
-      ...o,
-      start: timeMinutesToStr(o.start),
-      end: timeMinutesToStr(o.end),
-    })),
-  });
-  return mergedNumRanges;
-};
 
-const sliceRangesIntoAvailabilities = (numericDayRanges) => {
-  return numericDayRanges;
+  const slicedTimes = Array.from(set);
+  console.log(slicedTimes, set, messyNumericRanges, slicedTimes.map(timeMinutesToStr));
+  return [...slicedTimes.map(timeMinutesToStr).sort()];
 };
 
 export const parseAvailabilityRangesIntoArray = (ranges) => {
@@ -190,20 +116,21 @@ export const parseAvailabilityRangesIntoArray = (ranges) => {
     rangesByDay[range.day].push(range);
   });
 
-  const availabilities = [];
+  const cleanArr = [];
   Object.keys(rangesByDay).forEach((weekday) => {
-    const superposedNumericDayRanges = superposeRanges(rangesByDay[weekday]);
-    const dbReadySlicedAvailabilities = sliceRangesIntoAvailabilities(superposedNumericDayRanges);
-    dbReadySlicedAvailabilities.forEach((av) => availabilities.push(av));
+    const stringDayAvails = sliceSuperposeRanges(rangesByDay[weekday]);
+    // console.log(stringDayAvails);
+
+    cleanArr.push(
+      ...stringDayAvails.map((time) => ({
+        day: weekdayToDate(weekday).toString(),
+        time,
+        status: "1",
+      }))
+    );
   });
 
-  // const numericRanges = ranges.map((r) => ({
-  //   day: weekdayToDate(r.day),
-  //   start: timeStrToMinutes(r.start),
-  //   end: timeStrToMinutes(r.end),
-  // }));
-  console.log({ ranges, /** numericRanges,*/ availabilities, rangesByDay });
-  return ranges;
+  return cleanArr;
 };
 
 export const getProfessionalById = (id, professionals) => professionals.find((p) => p.id === id);
