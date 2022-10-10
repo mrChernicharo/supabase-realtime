@@ -24,7 +24,7 @@ export default function Staff() {
       />
       <For each={store.staff.map((o) => ({ ...o }))}>
         {(person) => (
-          <div className="d-flex">
+          <div class="d-flex clickable">
             <p onClick={(e) => setSelectedStaffId(person.id)}>
               {person.name} : {person.email}
             </p>

@@ -3,39 +3,45 @@ import { store } from "./store";
 
 import AvailabilityMatches from "./AvailabilityMatches";
 import { s } from "./styles";
+import Badge from "./Badge";
 
 export default function AppointmentRequests(props) {
-  // fetch customers without appointments & display
-
   const [customerId, setCustomerId] = createSignal(null);
 
-  const idleCustomers = () => {
-    if (store.customers.find((c) => !c.appointments)) return;
-    return store.customers.filter((c) => !c.appointments.length);
+  const customersWithoutAppointments = () => {
+    // if (store.customers.find((c) => !c.appointments)) return;
+    return store.customers.filter((c) => !c?.appointments?.length);
   };
-  const currCustomer = () => idleCustomers().find((c) => c.id === customerId());
+
+  const haveUnattendedCustomer = () =>
+    customersWithoutAppointments().find((c) => !c?.appointmentOffers?.length);
+
+  const currCustomer = () => customersWithoutAppointments().find((c) => c.id === customerId());
 
   return (
     <Show when={store.customers.length}>
-      <div style={{ border: "1px dashed" }}>
-        <Show when={idleCustomers().length}>
-          <div style={{ ...s.badge, background: "red" }}></div>
+      <div style={{ border: "1px dashed #ddd" }}>
+        <Show when={haveUnattendedCustomer()}>
+          <Badge danger />
         </Show>
+
         <h1>Appointment Requests</h1>
 
-        <For each={idleCustomers()}>
+        <For each={customersWithoutAppointments()}>
           {(customer) => (
-            <div onClick={(e) => setCustomerId(customer.id)}>
-              <h2>{customer.name}</h2>
+            <div class="clickable" onClick={(e) => setCustomerId(customer.id)}>
+              <div>
+                <div>{customer.name}</div>
+              </div>
             </div>
           )}
         </For>
 
-        {/* <pre>{JSON.stringify(idleCustomers(), null, 2)}</pre> */}
-
         <Show when={customerId() && currCustomer()}>
           <AvailabilityMatches customer={currCustomer()} onClose={() => setCustomerId(null)} />
         </Show>
+
+        {/* <pre>{JSON.stringify(customersWithoutAppointments(), null, 2)}</pre> */}
       </div>
     </Show>
   );

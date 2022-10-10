@@ -12,7 +12,7 @@ export default function Professionals() {
       <h2>Professionals</h2>
       <For each={store.professionals}>
         {(person) => (
-          <div className="d-flex">
+          <div class="d-flex clickable">
             <p onClick={(e) => setCurrProfessionalId(person.id)}>
               {person.name} : {person.email}
             </p>

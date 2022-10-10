@@ -24,15 +24,19 @@ export default function ProfessionalAvailability(props) {
       <ul style={s.ul}>
         <For each={props.availability}>
           {(timeBlock) => (
-            <li style={s.li}>
-              <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
-                {dateToWeekday(timeBlock.day)} {timeBlock.time}
-              </span>
-
-              <Show when={getProfessionalAppointments(timeBlock).length}>
-                <pre>{JSON.stringify(getProfessionalAppointments(timeBlock), null, 2)}</pre>
-
-                <AppointmentCard appointment={getProfessionalAppointments(timeBlock)[0]} />
+            <li style={{ ...s.li }}>
+              <Show
+                when={getProfessionalAppointments(timeBlock).length}
+                fallback={
+                  <>
+                    {dateToWeekday(timeBlock.day)} {timeBlock.time}
+                  </>
+                }
+              >
+                <AppointmentCard
+                  appointment={getProfessionalAppointments(timeBlock)[0]}
+                  style={{ "border-bottom": "1px solid #ddd", background: "#eee" }}
+                />
               </Show>
             </li>
           )}

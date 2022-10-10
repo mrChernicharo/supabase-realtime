@@ -1,3 +1,4 @@
+// inline styles
 export const s = {
   badge: {
     width: "12px",
@@ -10,5 +11,8 @@ export const s = {
   },
   li: {
     "list-style": "none",
+  },
+  clickable: {
+    cursor: "pointer",
   },
 };

@@ -1,6 +1,7 @@
 import { store } from "./store";
 import { dateToWeekday, getProfessionalById } from "./helpers";
 import { s } from "./styles";
+import AppointmentCard from "./AppointmentCard";
 
 export default function CustomerAvailability(props) {
   const getProfessionalName = (id) => getProfessionalById(id, store.professionals)?.name;
@@ -25,10 +26,24 @@ export default function CustomerAvailability(props) {
         <For each={props.availability}>
           {(timeBlock) => (
             <li style={s.li}>
-              <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
+              {/* <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
                 {dateToWeekday(timeBlock.day)} {timeBlock.time}
               </span>
-              <pre>{JSON.stringify(getCustomerAppointments(timeBlock), null, 2)}</pre>
+              <pre>{JSON.stringify(getCustomerAppointments(timeBlock), null, 2)}</pre> */}
+
+              <Show
+                when={getCustomerAppointments(timeBlock).length}
+                fallback={
+                  <>
+                    {dateToWeekday(timeBlock.day)} {timeBlock.time}
+                  </>
+                }
+              >
+                <AppointmentCard
+                  appointment={getCustomerAppointments(timeBlock)[0]}
+                  style={{ "border-bottom": "1px solid #ddd", background: "#eee" }}
+                />
+              </Show>
             </li>
           )}
         </For>
