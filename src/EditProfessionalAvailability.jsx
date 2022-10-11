@@ -137,10 +137,7 @@ export default function EditProfessionalAvailability(props) {
             <DayTimeRangeField
               slot={slot}
               onDelete={(val) => {
-                console.log("delete", val);
-                console.log("delete", { val, idx: idx() }, currAvailability());
-                const filtered = currAvailability().filter((s, i) => idx() !== i);
-                setCurrAvailability((prev) => filtered);
+                setCurrAvailability((prev) => currAvailability().filter((s, i) => idx() !== i));
               }}
             />
           )}
@@ -150,13 +147,11 @@ export default function EditProfessionalAvailability(props) {
             {(slot, idx) => (
               <DayTimeRangeField
                 slot={slot}
-                onChange={(sl) =>
-                  setAdditionalSlots((prev) => prev.map((s, i) => (idx() === i ? sl : s)))
+                onChange={(val) =>
+                  setAdditionalSlots((prev) => prev.map((s, i) => (idx() === i ? val : s)))
                 }
                 onDelete={(val) => {
-                  console.log("delete", { val, idx: idx() }, additionalSlots());
-                  const filtered = additionalSlots().filter((s, i) => idx() !== i);
-                  setAdditionalSlots((prev) => filtered);
+                  setAdditionalSlots((prev) => additionalSlots().filter((s, i) => idx() !== i));
                 }}
               />
             )}

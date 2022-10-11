@@ -5,8 +5,23 @@ import ProfessionalAvailability from "./ProfessionalAvailability";
 import { store } from "./store";
 import { s } from "./styles";
 import Icon from "./Icon";
+import { Show } from "solid-js";
 
 export default function ProfessionalDetails(props) {
+  const [isEditOpen, setIsEditOpen] = createSignal(false);
+
+  const openBtn = () => (
+    <button onClick={() => setIsEditOpen(true)}>
+      <Icon chevronDown />
+    </button>
+  );
+
+  const closeBtn = () => (
+    <button onClick={() => setIsEditOpen(false)}>
+      <Icon close />
+    </button>
+  );
+
   return (
     <div style={{ border: "1px dashed #ccc" }}>
       <button onClick={props.onClose}>
@@ -20,11 +35,14 @@ export default function ProfessionalDetails(props) {
         appointments={props.professional.appointments}
       />
 
-      <EditProfessionalAvailability
-        professionalId={props.professional.id}
-        appointments={props.professional.appointments}
-        availability={props.professional.availability}
-      />
+      <Show when={isEditOpen()} fallback={openBtn()}>
+        {closeBtn()}
+        <EditProfessionalAvailability
+          professionalId={props.professional.id}
+          appointments={props.professional.appointments}
+          availability={props.professional.availability}
+        />
+      </Show>
     </div>
   );
 }
