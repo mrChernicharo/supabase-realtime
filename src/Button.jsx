@@ -4,39 +4,39 @@ import Icon from "./Icon";
 export default function Button(props) {
   return (
     <Switch>
-      <Match when={props.type === "open"}>
+      <Match when={props.kind === "open"}>
         <button class="btn" onClick={props.onClick}>
           <Icon chevronDown />
         </button>
       </Match>
-      <Match when={props.type === "close"}>
+      <Match when={props.kind === "close"}>
         <button class="btn" onClick={props.onClick}>
           <Icon close />
         </button>
       </Match>
-      <Match when={props.type === "delete"}>
+      <Match when={props.kind === "delete"}>
         <button class="btn text-danger" onClick={props.onClick}>
           <Icon trash />
         </button>
       </Match>
-      <Match when={props.type === "trash"}>
+      <Match when={props.kind === "trash"}>
         <button class="btn text-danger" onClick={props.onClick}>
           <Icon trash />
         </button>
       </Match>
 
-      <Match when={props.type === "light"}>
+      <Match when={props.kind === "light"}>
         <button class="btn btn-light" onClick={props.onClick}>
           {props.text}
         </button>
       </Match>
 
-      <Match when={props.type === "CTA"}>
+      <Match when={props.kind === "CTA"}>
         <button class="btn btn-primary" onClick={props.onClick}>
           {props.text}
         </button>
       </Match>
-      <Match when={props.type === "success"}>
+      <Match when={props.kind === "success"}>
         <button class="btn btn-success" onClick={props.onClick}>
           {props.text}
         </button>
@@ -46,13 +46,13 @@ export default function Button(props) {
 }
 
 {
-  /* <button type="button" class="btn btn-primary">Primary</button>
-<button type="button" class="btn btn-secondary">Secondary</button>
-<button type="button" class="btn btn-success">Success</button>
-<button type="button" class="btn btn-danger">Danger</button>
-<button type="button" class="btn btn-warning">Warning</button>
-<button type="button" class="btn btn-info">Info</button>
-<button type="button" class="btn btn-light">Light</button>
-<button type="button" class="btn btn-dark">Dark</button>
-<button type="button" class="btn btn-link">Link</button> */
+  /* <Button kind="button" class="btn btn-primary">Primary</button>
+<Button kind="button" class="btn btn-secondary">Secondary</button>
+<Button kind="button" class="btn btn-success">Success</button>
+<Button kind="button" class="btn btn-danger">Danger</button>
+<Button kind="button" class="btn btn-warning">Warning</button>
+<Button kind="button" class="btn btn-info">Info</button>
+<Button kind="button" class="btn btn-light">Light</button>
+<Button kind="button" class="btn btn-dark">Dark</button>
+<Button kind="button" class="btn btn-link">Link</button> */
 }

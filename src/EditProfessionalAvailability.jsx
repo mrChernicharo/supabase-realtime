@@ -2,47 +2,15 @@ import { createSignal, createEffect } from "solid-js";
 import {
   dateToWeekday,
   weekdayToDate,
-  getWorkingHours,
+  WORKING_HOURS,
   mergeAvailabilityArrayIntoRanges,
   parseAvailabilityRangesIntoArray,
 } from "./helpers";
 import { DEFAULT_SLOT } from "./constants";
 import { updateProfessionalAvailability } from "./store";
-import Icon from "./Icon";
 import Button from "./Button";
-
-const workingHours = getWorkingHours({ min: "08:00", max: "20:00" });
-
-function DayTimeRangeField(props) {
-  let dayRef, startRef, endRef;
-  console.log({ props, v: dateToWeekday(+props.slot.day) });
-  function bubbleUpValue() {
-    const newSlot = {
-      day: weekdayToDate(dayRef.value).toString(),
-      start: startRef.value,
-      end: endRef.value,
-    };
-    props.onChange(newSlot);
-  }
-
-  return (
-    <div>
-      <select ref={dayRef} value={dateToWeekday(+props.slot.day)} onChange={bubbleUpValue}>
-        <For each={[0, 1, 2, 3, 4, 5, 6]}>{(day) => <option>{dateToWeekday(day)}</option>}</For>
-      </select>
-
-      <select ref={startRef} value={props.slot.start} onChange={bubbleUpValue}>
-        <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
-      </select>
-
-      <select ref={endRef} value={props.slot.end} onChange={bubbleUpValue}>
-        <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
-      </select>
-
-      <Button type="trash" onClick={(e) => props.onDelete(props.slot)} />
-    </div>
-  );
-}
+import Icon from "./Icon";
+import DayTimeRangeField from "./DayTimeRangeField";
 
 export default function EditProfessionalAvailability(props) {
   let addAvailabilityRangeFormRef;
@@ -123,10 +91,6 @@ export default function EditProfessionalAvailability(props) {
     setCurrAvailability(mergeAvailabilityArrayIntoRanges(props.availability));
   });
 
-  createEffect(() => {
-    console.log(additionalSlots());
-  });
-
   return (
     <div>
       <h5>Edit professional availability</h5>
@@ -156,18 +120,13 @@ export default function EditProfessionalAvailability(props) {
             )}
           </For>
 
-          <button
-            type="button"
-            class="btn btn-primary"
-            onClick={(e) => {
-              console.log("add slot");
-              setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT]);
-            }}
-          >
-            <Icon plus />
-          </button>
+          <Button
+            kind="light"
+            text={<Icon plus />}
+            onClick={(e) => setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT])}
+          />
         </div>
-        <button>Submit</button>
+        <Button kind="CTA" text="Submit" />
       </form>
     </div>
   );

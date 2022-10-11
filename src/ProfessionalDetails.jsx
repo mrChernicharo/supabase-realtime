@@ -13,7 +13,7 @@ export default function ProfessionalDetails(props) {
 
   return (
     <div style={{ border: "1px dashed #ccc" }}>
-      <Button type="close" onClick={props.onClose} />
+      <Button kind="close" onClick={props.onClose} />
 
       <h2>{props.professional.name}</h2>
       <p>{props.professional.email}</p>
@@ -25,9 +25,9 @@ export default function ProfessionalDetails(props) {
 
       <Show
         when={isEditOpen()}
-        fallback={<Button type="open" onClick={(e) => setIsEditOpen(true)} />}
+        fallback={<Button kind="open" onClick={(e) => setIsEditOpen(true)} />}
       >
-        <Button type="close" onClick={(e) => setIsEditOpen(false)} />
+        <Button kind="close" onClick={(e) => setIsEditOpen(false)} />
         <EditProfessionalAvailability
           professionalId={props.professional.id}
           appointments={props.professional.appointments}

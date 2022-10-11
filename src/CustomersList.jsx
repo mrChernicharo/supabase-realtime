@@ -33,7 +33,7 @@ export default function CustomersList() {
               </p>
 
               <Button
-                type="trash"
+                kind="trash"
                 onClick={(e) => {
                   removeCustomer(person.id);
                   setCurrCustomerId(null);

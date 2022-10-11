@@ -74,7 +74,7 @@ export default function AvailabilityMatches(props) {
 
   return (
     <div>
-      <Button type="close" onClick={props.onClose} />
+      <Button kind="close" onClick={props.onClose} />
 
       <h3>{props.customer.name}</h3>
       <p>{props.customer.email}</p>
@@ -122,7 +122,7 @@ export default function AvailabilityMatches(props) {
           </Show>
         </Show>
 
-        <Button text="Send" type="CTA" />
+        <Button kind="CTA" text="Send" />
       </form>
     </div>
   );

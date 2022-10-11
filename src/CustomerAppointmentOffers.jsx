@@ -61,7 +61,7 @@ export default function CustomerAppointmentOffers(props) {
 
                 <Button
                   text="confirm appointment"
-                  type="CTA"
+                  kind="CTA"
                   onClick={(e) => {
                     const dateStr = selectRef().value;
 

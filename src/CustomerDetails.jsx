@@ -20,7 +20,7 @@ export default function CustomerDetails(props) {
 
   return (
     <>
-      <Button type="close" onClick={props.onClose} />
+      <Button kind="close" onClick={props.onClose} />
 
       <h2>
         <Badge success={haveAppointments()} warn={hasOffers()} danger={isBrandNewUser()} />
@@ -44,10 +44,10 @@ export default function CustomerDetails(props) {
       <Show when={haveAppointments()}>
         <Show
           when={isAppointmentsOpen()}
-          fallback={<Button type="open" onClick={(e) => setIsAppointmentsOpen(true)} />}
+          fallback={<Button kind="open" onClick={(e) => setIsAppointmentsOpen(true)} />}
         >
           <div>
-            <Button type="close" onClick={(e) => setIsAppointmentsOpen(false)} />
+            <Button kind="close" onClick={(e) => setIsAppointmentsOpen(false)} />
             <Appointments appointments={props.customer.appointments} />
           </div>
         </Show>

@@ -19,7 +19,7 @@ export default function Professionals() {
             </p>
 
             <Button
-              type="trash"
+              kind="trash"
               onClick={(e) => {
                 removeProfessional(person.id);
                 setCurrProfessionalId(null);

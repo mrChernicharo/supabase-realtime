@@ -30,6 +30,8 @@ export const getWorkingHours = ({ min, max }) => {
     .map(timeMinutesToStr);
 };
 
+export const WORKING_HOURS = getWorkingHours({ min: "08:00", max: "20:00" });
+
 export const mergeAvailabilityArrayIntoRanges = (slots) => {
   const slotsByDay = {};
   slots.forEach((slot) => {

@@ -32,7 +32,7 @@ export default function Staff() {
             </p>
 
             <Button
-              type="delete"
+              kind="delete"
               onClick={(e) => {
                 removeStaff(person.id);
                 setSelectedStaffId(null);
@@ -43,11 +43,11 @@ export default function Staff() {
       </For>
 
       <Show when={selectedStaffId() && currUser()}>
-        <Button type="close" onClick={(e) => setSelectedStaffId(null)} />
+        <Button kind="close" onClick={(e) => setSelectedStaffId(null)} />
         <h3>{currUser().name}</h3>
         <p>{currUser().email}</p>
         <Button
-          type="light"
+          kind="light"
           text="Register Professional"
           onClick={(e) => addProfessional(currUser())}
         />
