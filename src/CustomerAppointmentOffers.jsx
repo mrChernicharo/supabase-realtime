@@ -7,7 +7,7 @@ import {
   dateToWeekday,
   getDiffFromNextSameWeekday,
 } from "./helpers";
-import Icon from "./Icon";
+import Button from "./Button";
 import { store, confirmOffer } from "./store";
 
 export default function CustomerAppointmentOffers(props) {
@@ -45,34 +45,41 @@ export default function CustomerAppointmentOffers(props) {
                 <summary></summary>
                 <label>start treatment at</label>
 
-                <select ref={setSelectRef} value={getPossibleDates(offer.day)[0].toDateString()}>
+                <select
+                  ref={setSelectRef}
+                  value={getPossibleDates(offer.day)[0].toDateString()}
+                  // onChange={(e) => {
+                  //   console.log(new Date(selectRef().value));
+
+                  //   console.log(selectRef().value);
+                  // }}
+                >
                   <For each={getPossibleDates(offer.day)}>
                     {(date) => <option>{date.toDateString()}</option>}
                   </For>
                 </select>
 
-                <button
-                  class="btn btn-success"
+                <Button
+                  text="confirm appointment"
+                  type="CTA"
                   onClick={(e) => {
-                    // console.log({ selectRef: selectRef() });
-                    const date = selectRef().value;
+                    const dateStr = selectRef().value;
 
-                    const ISODate = new Date(
-                      new Date(date).getTime() +
-                        timeStrToMinutes(offer.time) * 60 * 1000 -
-                        new Date(date).getTimezoneOffset() * 60 * 1000
-                    ).toISOString();
+                    const ISODateStrFromDateAndTime = (dateStr, time) => {
+                      return new Date(
+                        new Date(dateStr).getTime() +
+                          timeStrToMinutes(time) * 60 * 1000 -
+                          new Date(dateStr).getTimezoneOffset() * 60 * 1000
+                      ).toISOString();
+                    };
 
-                    // console.log({ ISODate });
                     confirmOffer(props.customerId, {
                       ...offer,
-                      selectedDate: date,
-                      ISODate,
+                      selectedDate: dateStr,
+                      ISODate: ISODateStrFromDateAndTime(dateStr, offer.time),
                     });
                   }}
-                >
-                  <Icon check /> confirm appointment
-                </button>
+                />
               </details>
             </div>
           );

@@ -9,6 +9,7 @@ import {
 import { DEFAULT_SLOT } from "./constants";
 import { updateProfessionalAvailability } from "./store";
 import Icon from "./Icon";
+import Button from "./Button";
 
 const workingHours = getWorkingHours({ min: "08:00", max: "20:00" });
 
@@ -38,9 +39,7 @@ function DayTimeRangeField(props) {
         <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
       </select>
 
-      <button type="button" class="btn btn-danger" onClick={(e) => props.onDelete(props.slot)}>
-        <Icon close />
-      </button>
+      <Button type="trash" onClick={(e) => props.onDelete(props.slot)} />
     </div>
   );
 }

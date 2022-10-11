@@ -3,6 +3,7 @@ import { store, removeCustomer } from "./store";
 import CustomerDetails from "./CustomerDetails";
 import Badge from "./Badge";
 import Icon from "./Icon";
+import Button from "./Button";
 
 export default function CustomersList() {
   const [currCustomerId, setCurrCustomerId] = createSignal(null);
@@ -30,15 +31,14 @@ export default function CustomersList() {
               <p onClick={(e) => setCurrCustomerId(person.id)}>
                 {person.name} : {person.email}
               </p>
-              <button
-                class="btn btn-danger"
+
+              <Button
+                type="trash"
                 onClick={(e) => {
                   removeCustomer(person.id);
                   setCurrCustomerId(null);
                 }}
-              >
-                <Icon trash />
-              </button>
+              />
             </div>
           </Show>
         )}

@@ -8,21 +8,10 @@ import { store } from "./store";
 import Badge from "./Badge";
 import Icon from "./Icon";
 import Appointments from "./Appointments";
+import Button from "./Button";
 
 export default function CustomerDetails(props) {
   const [isAppointmentsOpen, setIsAppointmentsOpen] = createSignal(false);
-
-  const openBtn = () => (
-    <button onClick={() => setIsAppointmentsOpen(true)}>
-      <Icon chevronDown />
-    </button>
-  );
-
-  const closeBtn = () => (
-    <button onClick={() => setIsAppointmentsOpen(false)}>
-      <Icon close />
-    </button>
-  );
 
   const isBrandNewUser = () =>
     !props.customer.appointments.length && !props.customer.appointmentOffers.length;
@@ -31,9 +20,8 @@ export default function CustomerDetails(props) {
 
   return (
     <>
-      <button onClick={props.onClose}>
-        <Icon close />
-      </button>
+      <Button type="close" onClick={props.onClose} />
+
       <h2>
         <Badge success={haveAppointments()} warn={hasOffers()} danger={isBrandNewUser()} />
         {props.customer.name}
@@ -54,9 +42,12 @@ export default function CustomerDetails(props) {
       </Show>
 
       <Show when={haveAppointments()}>
-        <Show when={isAppointmentsOpen()} fallback={openBtn()}>
+        <Show
+          when={isAppointmentsOpen()}
+          fallback={<Button type="open" onClick={(e) => setIsAppointmentsOpen(true)} />}
+        >
           <div>
-            {closeBtn()}
+            <Button type="close" onClick={(e) => setIsAppointmentsOpen(false)} />
             <Appointments appointments={props.customer.appointments} />
           </div>
         </Show>

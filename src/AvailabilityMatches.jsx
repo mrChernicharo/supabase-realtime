@@ -3,7 +3,7 @@ import { store, createAppointmentOffers } from "./store";
 import { dateToWeekday, getProfessionalById } from "./helpers";
 import { supabase } from "./supabaseClient";
 import { Show } from "solid-js";
-import Icon from "./Icon";
+import Button from "./Button";
 
 export default function AvailabilityMatches(props) {
   const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
@@ -74,9 +74,7 @@ export default function AvailabilityMatches(props) {
 
   return (
     <div>
-      <button onClick={props.onClose}>
-        <Icon close />
-      </button>
+      <Button type="close" onClick={props.onClose} />
 
       <h3>{props.customer.name}</h3>
       <p>{props.customer.email}</p>
@@ -124,7 +122,7 @@ export default function AvailabilityMatches(props) {
           </Show>
         </Show>
 
-        <button>Send</button>
+        <Button text="Send" type="CTA" />
       </form>
     </div>
   );

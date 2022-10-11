@@ -1,7 +1,7 @@
 import { createSignal, createEffect } from "solid-js";
 import { store, removeProfessional } from "./store";
 import ProfessionalDetails from "./ProfessionalDetails";
-import Icon from "./Icon";
+import Button from "./Button";
 
 export default function Professionals() {
   const [currProfessionalId, setCurrProfessionalId] = createSignal(null);
@@ -17,15 +17,14 @@ export default function Professionals() {
             <p onClick={(e) => setCurrProfessionalId(person.id)}>
               {person.name} : {person.email}
             </p>
-            <button
-              class="btn btn-danger"
+
+            <Button
+              type="trash"
               onClick={(e) => {
                 removeProfessional(person.id);
                 setCurrProfessionalId(null);
               }}
-            >
-              <Icon close />
-            </button>
+            />
           </div>
         )}
       </For>
