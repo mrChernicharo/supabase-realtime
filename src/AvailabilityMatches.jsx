@@ -76,39 +76,6 @@ export default function AvailabilityMatches(props) {
             onSubmit={handleSubmit}
             appointmentOffers={customerAppointmentOffers()}
           />
-          {/* <h5>appointment possibilities</h5>
-            <For each={Object.keys(matchesByProfessional())}>
-              {(profId, profIdx) => (
-                <Show when={matchesByProfessional()[profId].length}>
-                  <div style={{ border: "1px dashed #eee" }}>
-                    <h4>{getProfessionalById(profId, store.professionals).name}</h4>
-
-                    <For each={matchesByProfessional()[profId]}>
-                      {(block, i) => (
-                        <div>
-                          <label>
-                            {dateToWeekday(block.day)} {block.time} {"  "}
-                            <input
-                              type="checkbox"
-                              checked={isChecked(block)}
-                              data-day={block.day}
-                              data-time={block.time}
-                              data-professional_id={
-                                getProfessionalById(profId, store.professionals).id
-                              }
-                              data-professional_availability_slot_id={getProfessionalSlotId(
-                                block,
-                                profId
-                              )}
-                            />
-                          </label>
-                        </div>
-                      )}
-                    </For>
-                  </div>
-                </Show>
-              )}
-            </For> */}
         </Show>
       </Show>
     </div>

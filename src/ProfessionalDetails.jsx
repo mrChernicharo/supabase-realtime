@@ -1,7 +1,8 @@
 import { createSignal, onMount } from "solid-js";
 import { dateToWeekday, getCustomerById, getProfessionalById } from "./helpers";
-import EditProfessionalAvailability from "./EditProfessionalAvailability";
+import ProfessionalAvailabilityEdit from "./ProfessionalAvailabilityEdit";
 import ProfessionalAvailability from "./ProfessionalAvailability";
+import CollapseBox from "./CollapseBox";
 import { store } from "./store";
 import { s } from "./styles";
 import Icon from "./Icon";
@@ -10,10 +11,6 @@ import Button from "./Button";
 import Appointments from "./Appointments";
 
 export default function ProfessionalDetails(props) {
-  const [isEditOpen, setIsEditOpen] = createSignal(false);
-  const [isAvailabilityOpen, setIsAvailabilityOpen] = createSignal(false);
-  const [showAvailability, setShowAvailability] = createSignal(false);
-
   return (
     <div style={{ border: "1px dashed #ccc" }}>
       <Button kind="close" onClick={props.onClose} />
@@ -21,38 +18,24 @@ export default function ProfessionalDetails(props) {
       <h2>{props.professional.name}</h2>
       <p>{props.professional.email}</p>
 
-      <Show
-        when={isAvailabilityOpen()}
-        fallback={<Button kind="open" onClick={(e) => setIsAvailabilityOpen(true)} />}
-      >
-        <Button kind="close" onClick={(e) => setIsAvailabilityOpen(false)} />
+      <CollapseBox>
         <ProfessionalAvailability
           availability={props.professional.availability}
           appointments={props.professional.appointments}
         />
-      </Show>
+      </CollapseBox>
 
-      <Show
-        when={showAvailability()}
-        fallback={<Button kind="open" onClick={(e) => setShowAvailability(true)} />}
-      >
-        <div>
-          <Button kind="close" onClick={(e) => setShowAvailability(false)} />
-          <Appointments appointments={props.professional.appointments} />
-        </div>
-      </Show>
+      <CollapseBox>
+        <Appointments appointments={props.professional.appointments} />
+      </CollapseBox>
 
-      <Show
-        when={isEditOpen()}
-        fallback={<Button kind="open" onClick={(e) => setIsEditOpen(true)} />}
-      >
-        <Button kind="close" onClick={(e) => setIsEditOpen(false)} />
-        <EditProfessionalAvailability
+      <CollapseBox>
+        <ProfessionalAvailabilityEdit
           professionalId={props.professional.id}
           appointments={props.professional.appointments}
           availability={props.professional.availability}
         />
-      </Show>
+      </CollapseBox>
     </div>
   );
 }

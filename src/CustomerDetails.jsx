@@ -1,11 +1,7 @@
 import { createSignal, createEffect, Show, onMount } from "solid-js";
-import { dateToWeekday, getProfessionalById } from "./helpers";
 import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
 import CustomerAvailability from "./CustomerAvailability";
-import { s } from "./styles";
-import { store } from "./store";
 import Badge from "./Badge";
-import Icon from "./Icon";
 import Appointments from "./Appointments";
 import Button from "./Button";
 

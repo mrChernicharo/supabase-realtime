@@ -12,8 +12,8 @@ import Button from "./Button";
 import Icon from "./Icon";
 import DayTimeRangeField from "./DayTimeRangeField";
 
-export default function EditProfessionalAvailability(props) {
-  let addAvailabilityRangeFormRef;
+export default function ProfessionalAvailabilityEdit(props) {
+  let formRef;
   const [currAvailability, setCurrAvailability] = createSignal([]);
   const [additionalSlots, setAdditionalSlots] = createSignal([DEFAULT_SLOT]);
 
@@ -21,7 +21,7 @@ export default function EditProfessionalAvailability(props) {
 
   const haveSameDateAndTime = (a, b) => a.day === b.day && a.start === b.start && a.end === b.end;
 
-  function handleSubmitAvailabilityRanges(e) {
+  async function handleSubmitAvailabilityRanges(e) {
     e.preventDefault();
 
     // pluck weekday, start, end for all fields
@@ -84,7 +84,9 @@ export default function EditProfessionalAvailability(props) {
     // });
 
     // do that DB call!
-    updateProfessionalAvailability(props.professionalId, parsedNewAvailability);
+    await updateProfessionalAvailability(props.professionalId, parsedNewAvailability);
+
+    setAdditionalSlots([DEFAULT_SLOT]);
   }
 
   createEffect(() => {
@@ -94,7 +96,7 @@ export default function EditProfessionalAvailability(props) {
   return (
     <div>
       <h5>Edit professional availability</h5>
-      <form onSubmit={handleSubmitAvailabilityRanges} ref={addAvailabilityRangeFormRef}>
+      <form ref={formRef} onSubmit={handleSubmitAvailabilityRanges}>
         <For each={currAvailability()}>
           {(slot, idx) => (
             <DayTimeRangeField
@@ -122,6 +124,7 @@ export default function EditProfessionalAvailability(props) {
 
           <Button
             kind="light"
+            type="button"
             text={<Icon plus />}
             onClick={(e) => setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT])}
           />
