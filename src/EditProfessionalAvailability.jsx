@@ -7,6 +7,7 @@ import {
 } from "./helpers";
 import { DEFAULT_SLOT } from "./constants";
 import { updateProfessionalAvailability } from "./store";
+import Icon from "./Icon";
 
 const workingHours = getWorkingHours({ min: "08:00", max: "20:00" });
 
@@ -27,7 +28,7 @@ function DayTimeRangeField(props) {
       </select>
 
       <button type="button" class="btn btn-danger" onClick={(e) => props.onDelete(props.slot)}>
-        X
+        <Icon close />
       </button>
     </div>
   );
@@ -149,6 +150,7 @@ export default function EditProfessionalAvailability(props) {
 
           <button
             type="button"
+            class="btn btn-primary"
             onClick={(e) => {
               console.log("add slot");
               setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT]);
