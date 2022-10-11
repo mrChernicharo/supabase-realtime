@@ -1,23 +1,10 @@
-import Staff from "./Staff";
-import Customers from "./Customers";
-import Professionals from "./Professionals";
-import AppointmentRequests from "./AppointmentRequests";
-import { store } from "./store";
+import EntryPoint from "./EntryPoint";
+import Router from "./Routes";
 
 function App() {
   return (
-    <>
-      <div style={{ display: "flex" }}>
-        <Staff />
-
-        <Customers />
-
-        <Professionals />
-      </div>
-
-      <AppointmentRequests />
-      {/* <pre>{JSON.stringify(store, null, 2)}</pre> */}
-    </>
+    <Router />
+    // <EntryPoint />
   );
 }
 

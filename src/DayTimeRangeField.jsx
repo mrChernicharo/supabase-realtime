@@ -3,7 +3,7 @@ import Button from "./Button";
 
 export default function DayTimeRangeField(props) {
   let dayRef, startRef, endRef;
-  console.log({ props, v: dateToWeekday(+props.slot.day) });
+  // console.log({ props, v: dateToWeekday(+props.slot.day) });
   function bubbleUpValue() {
     const newSlot = {
       day: weekdayToDate(dayRef.value).toString(),

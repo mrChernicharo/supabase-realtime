@@ -6,7 +6,7 @@ import { Show } from "solid-js";
 import Button from "./Button";
 
 export default function AppointmentPossibilities(props) {
-  console.log(props.possibilities);
+  // console.log(props.possibilities);
 
   const getProfessionalSlotId = (block, profId) =>
     getProfessionalById(profId, store.professionals).availability.find((av) => av.id === block.id)
