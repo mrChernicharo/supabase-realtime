@@ -9,21 +9,25 @@ export default function Staff() {
 
   return (
     <div>
-      <label>Staff Email</label>
-      <input
-        type="email"
-        onChange={(e) => {
-          if (!e.currentTarget.validity.valid) {
-            console.log("invalid email!");
-            return;
-          }
-          const newStaff = {
-            name: e.currentTarget.value.split("@")[0],
-            email: e.currentTarget.value,
-          };
-          addStaff(newStaff);
-        }}
-      />
+      <h2>Staff</h2>
+
+      <div class="form-control">
+        <label>Staff Email</label>
+        <input
+          type="email"
+          onChange={(e) => {
+            if (!e.currentTarget.validity.valid) {
+              console.log("invalid email!");
+              return;
+            }
+            const newStaff = {
+              name: e.currentTarget.value.split("@")[0],
+              email: e.currentTarget.value,
+            };
+            addStaff(newStaff);
+          }}
+        />
+      </div>
       <For each={store.staff.map((o) => ({ ...o }))}>
         {(person) => (
           <div class="d-flex clickable">

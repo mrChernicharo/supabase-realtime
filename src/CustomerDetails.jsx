@@ -1,9 +1,8 @@
-import { createSignal, createEffect, onMount } from "solid-js";
+import { createSignal, createEffect, Show, onMount } from "solid-js";
 import { dateToWeekday, getProfessionalById } from "./helpers";
 import CustomerAppointmentOffers from "./CustomerAppointmentOffers";
 import CustomerAvailability from "./CustomerAvailability";
 import { s } from "./styles";
-import { Show } from "solid-js";
 import { store } from "./store";
 import Badge from "./Badge";
 import Icon from "./Icon";
@@ -12,6 +11,7 @@ import Button from "./Button";
 
 export default function CustomerDetails(props) {
   const [isAppointmentsOpen, setIsAppointmentsOpen] = createSignal(false);
+  const [showAvailability, setShowAvailability] = createSignal(false);
 
   const isBrandNewUser = () =>
     !props.customer.appointments.length && !props.customer.appointmentOffers.length;
@@ -19,7 +19,7 @@ export default function CustomerDetails(props) {
   const haveAppointments = () => props.customer.appointments.length;
 
   return (
-    <>
+    <div style={{ border: "1px dashed #ddd" }}>
       <Button kind="close" onClick={props.onClose} />
 
       <h2>
@@ -29,10 +29,16 @@ export default function CustomerDetails(props) {
       <p>{props.customer.email}</p>
       <p>{props.customer.id}</p>
 
-      <CustomerAvailability
-        availability={props.customer.availability}
-        appointments={props.customer.appointments}
-      />
+      <Show
+        when={showAvailability()}
+        fallback={<Button kind="open" onClick={(e) => setShowAvailability(true)} />}
+      >
+        <Button kind="close" onClick={(e) => setShowAvailability(false)} />
+        <CustomerAvailability
+          availability={props.customer.availability}
+          appointments={props.customer.appointments}
+        />
+      </Show>
 
       <Show when={!haveAppointments()}>
         <CustomerAppointmentOffers
@@ -52,6 +58,6 @@ export default function CustomerDetails(props) {
           </div>
         </Show>
       </Show>
-    </>
+    </div>
   );
 }

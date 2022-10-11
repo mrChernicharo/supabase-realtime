@@ -26,11 +26,6 @@ export default function CustomerAvailability(props) {
         <For each={props.availability}>
           {(timeBlock) => (
             <li style={s.li}>
-              {/* <span style={{ color: timeBlock.status === "1" ? "green" : "red" }}>
-                {dateToWeekday(timeBlock.day)} {timeBlock.time}
-              </span>
-              <pre>{JSON.stringify(getCustomerAppointments(timeBlock), null, 2)}</pre> */}
-
               <Show
                 when={getCustomerAppointments(timeBlock).length}
                 fallback={

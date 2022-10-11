@@ -4,14 +4,11 @@ import { dateToWeekday, getProfessionalById } from "./helpers";
 import { supabase } from "./supabaseClient";
 import { Show } from "solid-js";
 import Button from "./Button";
+import AppointmentPossibilities from "./AppointmentPossibilities";
 
 export default function AvailabilityMatches(props) {
-  const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
   const [isLoading, setIsLoading] = createSignal(true);
-
-  const getProfessionalSlotId = (block, profId) =>
-    getProfessionalById(profId, store.professionals).availability.find((av) => av.id === block.id)
-      .id;
+  const [customerAppointmentOffers, setCustomerAppointmentOffers] = createSignal(null);
 
   const matchesByProfessional = createMemo(() => {
     const customerAvailObj = {};
@@ -34,12 +31,6 @@ export default function AvailabilityMatches(props) {
 
     return matchingBlocksByProfessional;
   });
-
-  const isChecked = (block) => {
-    return customerAppointmentOffers().find(
-      (o) => o.professional_availability_slot_id === block.id
-    );
-  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -67,11 +58,6 @@ export default function AvailabilityMatches(props) {
 
     setIsLoading(false);
   });
-
-  // createEffect(() => {
-  //   console.log(customerAppointmentOffers());
-  // });
-
   return (
     <div>
       <Button kind="close" onClick={props.onClose} />
@@ -80,13 +66,17 @@ export default function AvailabilityMatches(props) {
       <p>{props.customer.email}</p>
       <p>{props.customer.id}</p>
 
-      <form onSubmit={handleSubmit}>
-        <Show when={!isLoading()} fallback={<div>Loading...</div>}>
-          <Show
-            when={Object.keys(matchesByProfessional()).length}
-            fallback={<div>No available professionals!</div>}
-          >
-            <h5>appointment possibilities</h5>
+      <Show when={!isLoading()} fallback={<div>Loading...</div>}>
+        <Show
+          when={Object.keys(matchesByProfessional()).length}
+          fallback={<div>No available professionals!</div>}
+        >
+          <AppointmentPossibilities
+            possibilities={matchesByProfessional()}
+            onSubmit={handleSubmit}
+            appointmentOffers={customerAppointmentOffers()}
+          />
+          {/* <h5>appointment possibilities</h5>
             <For each={Object.keys(matchesByProfessional())}>
               {(profId, profIdx) => (
                 <Show when={matchesByProfessional()[profId].length}>
@@ -118,12 +108,9 @@ export default function AvailabilityMatches(props) {
                   </div>
                 </Show>
               )}
-            </For>
-          </Show>
+            </For> */}
         </Show>
-
-        <Button kind="CTA" text="Send" />
-      </form>
+      </Show>
     </div>
   );
 }
