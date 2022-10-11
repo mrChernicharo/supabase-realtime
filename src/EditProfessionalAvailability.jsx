@@ -1,6 +1,7 @@
 import { createSignal, createEffect } from "solid-js";
 import {
   dateToWeekday,
+  weekdayToDate,
   getWorkingHours,
   mergeAvailabilityArrayIntoRanges,
   parseAvailabilityRangesIntoArray,
@@ -12,18 +13,28 @@ import Icon from "./Icon";
 const workingHours = getWorkingHours({ min: "08:00", max: "20:00" });
 
 function DayTimeRangeField(props) {
+  let dayRef, startRef, endRef;
   console.log({ props, v: dateToWeekday(+props.slot.day) });
+  function bubbleUpValue() {
+    const newSlot = {
+      day: weekdayToDate(dayRef.value).toString(),
+      start: startRef.value,
+      end: endRef.value,
+    };
+    props.onChange(newSlot);
+  }
+
   return (
     <div>
-      <select value={dateToWeekday(+props.slot.day)}>
+      <select ref={dayRef} value={dateToWeekday(+props.slot.day)} onChange={bubbleUpValue}>
         <For each={[0, 1, 2, 3, 4, 5, 6]}>{(day) => <option>{dateToWeekday(day)}</option>}</For>
       </select>
 
-      <select value={props.slot.start}>
+      <select ref={startRef} value={props.slot.start} onChange={bubbleUpValue}>
         <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
       </select>
 
-      <select value={props.slot.end}>
+      <select ref={endRef} value={props.slot.end} onChange={bubbleUpValue}>
         <For each={workingHours}>{(hour) => <option>{hour}</option>}</For>
       </select>
 
@@ -139,6 +150,9 @@ export default function EditProfessionalAvailability(props) {
             {(slot, idx) => (
               <DayTimeRangeField
                 slot={slot}
+                onChange={(sl) =>
+                  setAdditionalSlots((prev) => prev.map((s, i) => (idx() === i ? sl : s)))
+                }
                 onDelete={(val) => {
                   console.log("delete", { val, idx: idx() }, additionalSlots());
                   const filtered = additionalSlots().filter((s, i) => idx() !== i);
@@ -156,7 +170,7 @@ export default function EditProfessionalAvailability(props) {
               setAdditionalSlots((prev) => [...prev, DEFAULT_SLOT]);
             }}
           >
-            +
+            <Icon plus />
           </button>
         </div>
         <button>Submit</button>

@@ -17,6 +17,7 @@ export const timeStrToMinutes = (timeStr) => {
   // console.log({ timeStr, hours, mins, totalMinutes });
   return totalMinutes;
 };
+
 export const timeMinutesToStr = (minutes) =>
   `${parseInt(minutes / 60) < 10 ? `0${parseInt(minutes / 60)}` : parseInt(minutes / 60)}:${
     minutes % 60 > 0 ? minutes % 60 : `${minutes % 60}0`
@@ -142,12 +143,10 @@ export const getDiffFromNextSameWeekday = (weekday) => {
   const todayWeekday = new Date().getDay();
   let dayDiff;
 
-  if (futureWeekday > todayWeekday) {
-    // same week
-    dayDiff = futureWeekday - todayWeekday;
-  } else {
-    // next week
-    dayDiff = futureWeekday + 7 - todayWeekday;
-  }
+  // same week
+  if (futureWeekday > todayWeekday) dayDiff = futureWeekday - todayWeekday;
+  // next week
+  else dayDiff = futureWeekday + 7 - todayWeekday;
+
   return dayDiff;
 };

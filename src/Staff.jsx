@@ -48,7 +48,7 @@ export default function Staff() {
         </button>
         <h3>{currUser().name}</h3>
         <p>{currUser().email}</p>
-        <button onClick={(e) => addProfessional(currUser())}>Create Professional</button>
+        <button onClick={(e) => addProfessional(currUser())}>Register Professional</button>
       </Show>
     </div>
   );

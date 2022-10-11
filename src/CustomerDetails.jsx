@@ -7,14 +7,27 @@ import { Show } from "solid-js";
 import { store } from "./store";
 import Badge from "./Badge";
 import Icon from "./Icon";
+import Appointments from "./Appointments";
 
 export default function CustomerDetails(props) {
-  const noAppointments = () => !props.customer.appointments.length;
+  const [isAppointmentsOpen, setIsAppointmentsOpen] = createSignal(false);
 
-  const isBrandNewUser = (person) =>
-    !person.appointments.length && !person.appointmentOffers.length;
-  const hasOffers = (person) => person.appointmentOffers.length;
-  const haveAppointments = (person) => person.appointments.length;
+  const openBtn = () => (
+    <button onClick={() => setIsAppointmentsOpen(true)}>
+      <Icon chevronDown />
+    </button>
+  );
+
+  const closeBtn = () => (
+    <button onClick={() => setIsAppointmentsOpen(false)}>
+      <Icon close />
+    </button>
+  );
+
+  const isBrandNewUser = () =>
+    !props.customer.appointments.length && !props.customer.appointmentOffers.length;
+  const hasOffers = () => props.customer.appointmentOffers.length;
+  const haveAppointments = () => props.customer.appointments.length;
 
   return (
     <>
@@ -22,11 +35,7 @@ export default function CustomerDetails(props) {
         <Icon close />
       </button>
       <h2>
-        <Badge
-          success={haveAppointments(props.customer)}
-          warn={hasOffers(props.customer)}
-          danger={isBrandNewUser(props.customer)}
-        />
+        <Badge success={haveAppointments()} warn={hasOffers()} danger={isBrandNewUser()} />
         {props.customer.name}
       </h2>
       <p>{props.customer.email}</p>
@@ -37,11 +46,20 @@ export default function CustomerDetails(props) {
         appointments={props.customer.appointments}
       />
 
-      <Show when={noAppointments()}>
+      <Show when={!haveAppointments()}>
         <CustomerAppointmentOffers
           customerId={props.customer.id}
           offers={props.customer.appointmentOffers}
         />
+      </Show>
+
+      <Show when={haveAppointments()}>
+        <Show when={isAppointmentsOpen()} fallback={openBtn()}>
+          <div>
+            {closeBtn()}
+            <Appointments appointments={props.customer.appointments} />
+          </div>
+        </Show>
       </Show>
     </>
   );
