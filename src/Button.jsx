@@ -24,6 +24,11 @@ export default function Button(props) {
           <Icon trash />
         </button>
       </Match>
+      <Match when={props.kind === "logout"}>
+        <button class="btn" {...props}>
+          <Icon logout />
+        </button>
+      </Match>
 
       <Match when={props.kind === "light"}>
         <button class="btn btn-light" {...props}>

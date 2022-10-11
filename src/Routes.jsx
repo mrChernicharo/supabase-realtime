@@ -6,11 +6,19 @@ import Customer from "./Customer";
 import NotFound from "./NotFound";
 
 import Login from "./Login";
+import Button from "./Button";
+
+import { s } from "./styles";
+import { userStore, logout } from "./userStore";
 
 export default function Router() {
   const Layout = () => (
     <div>
-      <header>🌺 Laços</header>
+      <header style={s.header}>
+        <div>🌺 Laços</div>
+        {userStore.id && <div>{userStore.name}</div>}
+        {userStore.id && <Button kind="logout" onClick={logout} />}
+      </header>
 
       <Outlet />
     </div>

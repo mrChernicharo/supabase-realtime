@@ -207,6 +207,8 @@ const addCustomer = async ({ name, email }) => {
     event: "customer_added",
     entry,
   });
+
+  return entry;
 };
 
 const addProfessional = async ({ name, email }) => {
@@ -235,6 +237,8 @@ const addProfessional = async ({ name, email }) => {
     event: "professional_added",
     entry,
   });
+
+  return entry;
 };
 
 const removeStaff = async (id) => {
